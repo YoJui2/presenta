@@ -3,19 +3,22 @@
    Base casi negra + acentos cálidos (naranja / dorado / ámbar / brasa)
    ========================================================== */
 :root{
-  --bg:#0a0806;
-  --surface:#140f0a;
-  --line:#2b1f15;
-  --txt:#f6ece2;
-  --muted:#b39a86;
-  --dim:#8a7462;
-  --naranja:#e2620f;
-  --dorado:#d9900c;
-  --ambar:#f0b429;
-  --cobre:#e08a4a;
-  --brasa:#d94a45;
-  --terracota:#a85c33;
-  --miel:#f0cfa8;
+  --bg:#0A0A0B;
+  --bg-deep:#121214;
+  --surface:#1A1A1E;
+  --surface-soft:#151518;
+  --line:#2E2318;
+  --txt:#EAE6DF;
+  --muted:#9E988F;
+  --dim:#7A736B;
+  --primario:#D97736;
+  --naranja:#E05A2B;
+  --dorado:#F4A261;
+  --ambar:#D97736;
+  --cobre:#D97736;
+  --brasa:#B55A43;
+  --terracota:#A94E3A;
+  --miel:#F4A261;
   --radius:16px;
   --shadow:0 18px 50px -22px rgba(0,0,0,.9);
   --sans:"Inter","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
@@ -26,10 +29,10 @@ html,body{height:100%}
 body{
   margin:0;overflow:hidden;color:var(--txt);font-family:var(--sans);
   background:
-    radial-gradient(1100px 700px at 12% -12%, #1c1109 0%, transparent 60%),
-    radial-gradient(900px 650px at 108% 6%, #1a0d07 0%, transparent 56%),
-    radial-gradient(800px 600px at 50% 120%, #140a05 0%, transparent 58%),
-    var(--bg);
+    radial-gradient(1100px 700px at 12% -12%, rgba(217,119,54,.08) 0%, transparent 58%),
+    radial-gradient(900px 650px at 108% 6%, rgba(192,92,40,.06) 0%, transparent 52%),
+    radial-gradient(800px 600px at 50% 120%, rgba(255,191,120,.03) 0%, transparent 58%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
   -webkit-font-smoothing:antialiased;
 }
 body::before{
@@ -82,17 +85,17 @@ code{font-family:var(--mono);font-size:.9em;background:rgba(226,98,15,.1);border
 .g-3-2{grid-template-columns:1.35fr .65fr}
 
 /* ---------------- COMPONENTES ---------------- */
-.card{background:linear-gradient(160deg,rgba(255,255,255,.038),rgba(255,255,255,.008));border:1px solid var(--line);border-radius:var(--radius);padding:clamp(11px,1.2vw,18px);box-shadow:var(--shadow)}
+.card{background:linear-gradient(180deg, rgba(26,26,30,0.96), rgba(18,18,20,0.96));border:1px solid var(--line);border-radius:var(--radius);padding:clamp(11px,1.2vw,18px);box-shadow:0 10px 30px -24px rgba(0,0,0,0.85)}
 .card.pad-lg{padding:clamp(14px,1.6vw,24px)}
-.card.gold{border-color:rgba(240,180,41,.3);background:linear-gradient(160deg,rgba(240,180,41,.075),rgba(240,180,41,.012))}
-.card.ember{border-color:rgba(217,74,69,.32);background:linear-gradient(160deg,rgba(217,74,69,.075),rgba(217,74,69,.012))}
-.card.copper{border-color:rgba(224,138,74,.3);background:linear-gradient(160deg,rgba(224,138,74,.07),rgba(224,138,74,.012))}
-.card.clay{border-color:rgba(168,92,51,.32);background:linear-gradient(160deg,rgba(168,92,51,.08),rgba(168,92,51,.012))}
+.card.gold{border-color:rgba(244,162,97,.34);background:linear-gradient(180deg, rgba(244,162,97,.06), rgba(18,18,20,.96))}
+.card.ember{border-color:rgba(200,75,49,.32);background:linear-gradient(180deg, rgba(200,75,49,.07), rgba(18,18,20,.96))}
+.card.copper{border-color:rgba(217,119,54,.34);background:linear-gradient(180deg, rgba(217,119,54,.07), rgba(18,18,20,.96))}
+.card.clay{border-color:rgba(217,119,54,.28);background:linear-gradient(180deg, rgba(217,119,54,.06), rgba(18,18,20,.96))}
 .card h3 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;vertical-align:middle;background:var(--naranja)}
 
 .badge{display:inline-flex;align-items:center;gap:7px;padding:.3em .7em;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.04em;border:1px solid}
 .badge.b-gold{color:var(--ambar);border-color:rgba(240,180,41,.3);background:rgba(240,180,41,.07)}
-.badge.b-ember{color:var(--brasa);border-color:rgba(217,74,69,.3);background:rgba(217,74,69,.07)}
+.badge.b-ember{color:var(--brasa);border-color:rgba(181,90,67,.3);background:rgba(181,90,67,.07)}
 .badge.b-copper{color:var(--cobre);border-color:rgba(224,138,74,.3);background:rgba(224,138,74,.07)}
 .badge.b-clay{color:var(--terracota);border-color:rgba(168,92,51,.3);background:rgba(168,92,51,.07)}
 .badge.b-dim{color:var(--muted);border-color:var(--line);background:rgba(255,255,255,.04)}
@@ -104,7 +107,7 @@ code{font-family:var(--mono);font-size:.9em;background:rgba(226,98,15,.1);border
 
 .note{border-left:3px solid var(--naranja);background:rgba(226,98,15,.06);padding:.7em .9em;border-radius:0 12px 12px 0;color:#e0cbb9;font-size:.86rem;line-height:1.5}
 .note.gold{border-color:var(--ambar);background:rgba(240,180,41,.055);color:#ecdcbe}
-.note.ember{border-color:var(--brasa);background:rgba(217,74,69,.055);color:#eccbc7}
+.note.ember{border-color:var(--brasa);background:rgba(181,90,67,.055);color:#eccbc7}
 .note.copper{border-color:var(--cobre);background:rgba(224,138,74,.055);color:#ecd6c2}
 
 /* ---------------- DESLIZANTES ---------------- */
@@ -205,7 +208,7 @@ tr.act td:first-child{box-shadow:inset 3px 0 0 var(--ambar)}
 .cm .cellbox.tp .n{color:var(--ambar)}
 .cm .cellbox.fn{border-color:rgba(224,138,74,.36);background:rgba(224,138,74,.07)}
 .cm .cellbox.fn .n{color:var(--cobre)}
-.cm .cellbox.fp{border-color:rgba(217,74,69,.36);background:rgba(217,74,69,.07)}
+.cm .cellbox.fp{border-color:rgba(181,90,67,.36);background:rgba(181,90,67,.07)}
 .cm .cellbox.fp .n{color:var(--brasa)}
 .cm .cellbox.tn .n{color:var(--muted)}
 
@@ -273,7 +276,7 @@ kbd{font-family:var(--mono);font-size:.72rem;background:rgba(255,255,255,.1);bor
 .float-folds{display:flex;gap:7px;justify-content:center;margin:1.2em 0 .2em}
 .float-folds i{width:44px;height:58px;border-radius:9px;border:1.5px solid rgba(226,98,15,.32);background:linear-gradient(160deg,rgba(226,98,15,.1),transparent);animation:fl 3.4s ease-in-out infinite}
 .float-folds i:nth-child(2){animation-delay:.25s;border-color:rgba(224,138,74,.32)}
-.float-folds i:nth-child(3){animation-delay:.5s;border-color:rgba(217,90,12,.32)}
+.float-folds i:nth-child(3){animation-delay:.5s;border-color:rgba(185,109,60,.32)}
 .float-folds i:nth-child(4){animation-delay:.75s;border-color:rgba(240,180,41,.38);background:linear-gradient(160deg,rgba(240,180,41,.12),transparent)}
 .float-folds i:nth-child(5){animation-delay:1s;border-color:rgba(168,92,51,.32)}
 @keyframes fl{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-14px);opacity:1}}
