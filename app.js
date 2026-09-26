@@ -301,6 +301,7 @@ exVals.forEach((v, i) => {
 function exUpdate() {
   const vals = $$("input", exSliders).map(i => +i.value);
   $$("output", exSliders).forEach((o, i) => o.textContent = vals[i] + "%");
+  $$("input", exSliders).forEach(paintSlider);
   const m = mean(vals), s = std(vals);
   $("#exMean").textContent = fmt(m) + "%";
   $("#exStd").textContent = "±" + fmt(s) + "%";
@@ -326,7 +327,10 @@ function stBuild(box, vals, cls) {
       '<input type="range" min="50" max="100" step="1" value="' + v + '" class="' + cls + '">';
     box.appendChild(d);
     paintSlider(d.querySelector("input"));
-    d.querySelector("input").addEventListener("input", stUpdate);
+    d.querySelector("input").addEventListener("input", () => {
+      paintSlider(d.querySelector("input"));
+      stUpdate();
+    });
   });
 }
 function stChart(box, vals, color) {
@@ -361,6 +365,8 @@ function stUpdate() {
   const a = $$("#stSlidersA input").map(i => +i.value), b = $$("#stSlidersB input").map(i => +i.value);
   $$("#stSlidersA output").forEach((o, i) => o.textContent = a[i] + "%");
   $$("#stSlidersB output").forEach((o, i) => o.textContent = b[i] + "%");
+  $$("#stSlidersA input").forEach(paintSlider);
+  $$("#stSlidersB input").forEach(paintSlider);
   stChart($("#stChartA"), a, "var(--ambar)");
   stChart($("#stChartB"), b, "var(--brasa)");
   $("#stMeanA").textContent = fmt(mean(a)) + "%";
