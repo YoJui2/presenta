@@ -336,12 +336,12 @@ function stChart(box, vals, color) {
   let g = '<svg class="scg2" viewBox="0 0 ' + W + " 88" + '" preserveAspectRatio="xMidYMid meet" role="img">';
   [50, 70, 90].forEach(v => {
     g += '<line x1="' + x0 + '" y1="' + y(v).toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y(v).toFixed(1) + '" stroke="rgba(255,255,255,.08)"/>' +
-      '<text x="' + (x0 - 3) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" font-size="7" fill="#9b7e67">' + v + "</text>";
+      '<text x="' + (x0 - 3) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" font-size="7" fill="var(--dim)">' + v + "</text>";
   });
   vals.forEach((v, i) => {
     const x = x0 + i * (bw + gap), yy = y(v);
     g += '<rect x="' + x + '" y="' + yy.toFixed(1) + '" width="' + bw + '" height="' + (base - yy).toFixed(1) + '" rx="4" fill="' + color + '" opacity=".82"/>' +
-      '<text x="' + (x + bw / 2) + '" y="' + (base + 12) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#c9a992">F' + (i + 1) + "</text>";
+      '<text x="' + (x + bw / 2) + '" y="' + (base + 12) + '" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)">F' + (i + 1) + "</text>";
   });
   g += '<line x1="' + x0 + '" y1="' + y(m).toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y(m).toFixed(1) + '" stroke="var(--ambar)" stroke-width="1.8" stroke-dasharray="5 3"/>';
   g += "</svg>";
@@ -560,20 +560,20 @@ function bvDraw() {
       '<text x="' + (L - 8) + '" y="' + (Y(v) + 3).toFixed(1) + '" text-anchor="end">' + Math.round(v * 100) + "%</text>";
   }
   g += '<rect x="' + X(5).toFixed(1) + '" y="' + T + '" width="' + (X(10) - X(5)).toFixed(1) + '" height="' + (H - T - B) +
-    '" fill="rgba(249,115,22,.14)" stroke="rgba(249,115,22,.45)" stroke-dasharray="4 4"/>';
-  g += '<text class="strong" x="' + ((X(5) + X(10)) / 2).toFixed(1) + '" y="' + (T + 13) + '" text-anchor="middle" fill="#c2703c">zona 5–10</text>';
+    '" fill="rgba(226,98,15,.1)" stroke="rgba(226,98,15,.34)" stroke-dasharray="4 4"/>';
+  g += '<text class="strong" x="' + ((X(5) + X(10)) / 2).toFixed(1) + '" y="' + (T + 13) + '" text-anchor="middle" fill="var(--terracota)">zona 5–10</text>';
   for (let v = 2; v <= 20; v += 2) g += '<text x="' + X(v).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + v + "</text>";
-  g += '<text class="strong" x="' + ((L + W - R) / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#c9a992">k · número de folds</text>';
+  g += '<text class="strong" x="' + ((L + W - R) / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" fill="var(--muted)">k · número de folds</text>';
   g += '<line class="axis" x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '"/>' +
     '<line class="axis" x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '"/>';
-  [[P_BIAS, "#ef5350", 2], [P_VAR, "#f59e0b", 2], [P_TOT, "#fbbf24", 3]].forEach(s => {
+  [[P_BIAS, "var(--brasa)", 2], [P_VAR, "var(--dorado)", 2], [P_TOT, "var(--ambar)", 3]].forEach(s => {
     const pts = [];
     for (let v = 2; v <= 20; v += .25) pts.push([X(v), Y(interp(s[0], v))]);
     g += '<path d="' + smoothPath(pts) + '" fill="none" stroke="' + s[1] + '" stroke-width="' + s[2] + '" stroke-linecap="round" opacity=".92"/>';
   });
   const ky = Y(interp(P_TOT, k)).toFixed(1);
   g += '<line x1="' + X(k).toFixed(1) + '" y1="' + T + '" x2="' + X(k).toFixed(1) + '" y2="' + (H - B) + '" stroke="rgba(255,255,255,.28)" stroke-dasharray="3 4"/>';
-  g += '<circle cx="' + X(k).toFixed(1) + '" cy="' + ky + '" r="6" fill="#fff" stroke="#fbbf24" stroke-width="3"/>';
+  g += '<circle cx="' + X(k).toFixed(1) + '" cy="' + ky + '" r="6" fill="#fff" stroke="var(--ambar)" stroke-width="3"/>';
   g += '<text class="strong" x="' + X(k).toFixed(1) + '" y="' + (parseFloat(ky) - 14).toFixed(1) + '" text-anchor="middle" fill="#fff">k=' + k + "</text>";
   $("#bvChart").innerHTML = g;
   $("#bvKOut").textContent = k;
@@ -581,13 +581,13 @@ function bvDraw() {
   $("#bvEvals").textContent = k;
   const trainPct = Math.round((k - 1) / k * 100), t = $("#bvText"), card = $("#bvVerdict");
   if (k <= 3) {
-    card.style.borderColor = "rgba(239,83,80,.5)";
+    card.style.borderColor = "rgba(217,74,69,.42)";
     t.innerHTML = "<strong style='color:var(--brasa)'>k = " + k + ": alto sesgo pesimista.</strong> El modelo se entrena con sólo " + trainPct + "% de los datos, así que la métrica <em>subestima</em> el desempeño real. A cambio, la varianza es baja: estimación estable pero pesimista.";
   } else if (k <= 10) {
-    card.style.borderColor = "rgba(251,191,36,.5)";
+    card.style.borderColor = "rgba(240,180,41,.38)";
     t.innerHTML = "<strong style='color:var(--ambar)'>k = " + k + ": punto óptimo empírico.</strong> Entrenamiento con " + trainPct + "%, " + k + " evaluaciones y un compromiso equilibrado entre sesgo moderado y varianza controlada. Recomendado por Hastie et al. (2009) y Kohavi (1995).";
   } else {
-    card.style.borderColor = "rgba(251,146,60,.55)";
+    card.style.borderColor = "rgba(224,138,74,.45)";
     t.innerHTML = "<strong style='color:var(--cobre)'>k = " + k + ": varianza elevada.</strong> Cada fold aporta muy poca información nueva y las estimaciones quedan altamente correlacionadas. Si k tiende a N tenés LOOCV: insesgado pero carísimo.";
   }
 }
@@ -645,17 +645,17 @@ function leakDraw() {
   const names = ["Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"];
   let h = '<div class="foldwrap" style="gap:7px">';
   names.forEach((f, i) => {
-    h += '<div class="fold" style="padding:.5em .6em;border-color:' + (leakCorrect ? "rgba(251,191,36,.4)" : "rgba(239,83,80,.4)") + '">' +
+    h += '<div class="fold" style="padding:.5em .6em;border-color:' + (leakCorrect ? "rgba(240,180,41,.3)" : "rgba(217,74,69,.3)") + '">' +
       '<div class="fname" style="margin:0"><span>' + f + "</span><em>" + (i === 0 ? "prueba" : "entrenamiento") + "</em></div>" +
-      '<div style="height:14px;border-radius:6px;margin-top:5px;background:repeating-linear-gradient(115deg,rgba(194,112,60,.45) 0 5px,rgba(194,112,60,.12) 5px 10px)"></div></div>';
+      '<div style="height:14px;border-radius:6px;margin-top:5px;background:repeating-linear-gradient(115deg,rgba(168,92,51,.38) 0 5px,rgba(168,92,51,.1) 5px 10px)"></div></div>';
   });
   h += "</div>";
   h += '<div style="margin-top:16px;position:relative;height:76px">';
   if (leakCorrect) {
-    h += '<div style="position:absolute;left:8%;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--ambar),var(--dorado));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#2a1200">StandardScaler.fit() + modelo</div>' +
+    h += '<div style="position:absolute;left:8%;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--ambar),var(--dorado));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#1a0c02">StandardScaler.fit() + modelo</div>' +
       '<div style="position:absolute;left:0;right:0;top:42px;text-align:center;font-size:.7rem;color:var(--muted)">se ajusta sólo sobre los folds de entrenamiento (80%)</div>';
   } else {
-    h += '<div style="position:absolute;left:0;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--brasa),var(--miel));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#2a0d05">StandardScaler.fit() sobre TODO X</div>' +
+    h += '<div style="position:absolute;left:0;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--brasa),var(--miel));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#200a04">StandardScaler.fit() sobre TODO X</div>' +
       '<div style="position:absolute;left:0;right:0;top:42px;text-align:center;font-size:.7rem;color:var(--muted)">incluye el fold de prueba → la media y la varianza se filtran</div>';
   }
   h += "</div>";
@@ -675,33 +675,33 @@ $("#leakToggle").onclick = () => { leakCorrect = !leakCorrect; leakDraw(); };
    ========================================================== */
 let nested = true;
 function nestDraw() {
-  let g = '<text x="14" y="16" font-size="11" font-weight="700" fill="#fbbf24">Bucle externo · 5 folds (evaluacion)</text>';
+  let g = '<text x="14" y="16" font-size="11" font-weight="700" fill="var(--ambar)">Bucle externo · 5 folds (evaluacion)</text>';
   const ox = 14, oy = 24, ow = 332, oh = 258;
-  g += '<rect x="' + ox + '" y="' + oy + '" width="' + ow + '" height="' + oh + '" rx="14" fill="rgba(251,191,36,.07)" stroke="rgba(251,191,36,.6)" stroke-width="1.6"/>';
+  g += '<rect x="' + ox + '" y="' + oy + '" width="' + ow + '" height="' + oh + '" rx="14" fill="rgba(240,180,41,.04)" stroke="rgba(240,180,41,.4)" stroke-width="1.6"/>';
   const fw = (ow - 20) / 5;
   for (let i = 0; i < 5; i++) {
     const isTest = i === 0;
     g += '<rect x="' + (ox + 10 + i * fw).toFixed(1) + '" y="' + (oy + 10) + '" width="' + (fw - 4).toFixed(1) + '" height="' + (oh - 20) + '" rx="9" fill="' +
-      (isTest ? "rgba(251,191,36,.16)" : "rgba(255,255,255,.03)") + '" stroke="' + (isTest ? "#fbbf24" : "rgba(255,255,255,.14)") + '" stroke-width="' + (isTest ? 2 : 1) + '"/>' +
-      '<text x="' + (ox + 10 + i * fw + fw / 2 - 2).toFixed(1) + '" y="' + (oy + oh - 14) + '" text-anchor="middle" fill="' + (isTest ? "#fbbf24" : "#c9a992") + '">F' + (i + 1) + "</text>";
+      (isTest ? "rgba(240,180,41,.09)" : "rgba(255,255,255,.018)") + '" stroke="' + (isTest ? "var(--ambar)" : "rgba(255,255,255,.11)") + '" stroke-width="' + (isTest ? 2 : 1) + '"/>' +
+      '<text x="' + (ox + 10 + i * fw + fw / 2 - 2).toFixed(1) + '" y="' + (oy + oh - 14) + '" text-anchor="middle" fill="' + (isTest ? "var(--ambar)" : "var(--muted)") + '">F' + (i + 1) + "</text>";
   }
-  g += '<text x="20" y="42" font-size="10" font-weight="700" fill="#fbbf24">TEST F1 (nunca visto)</text>';
+  g += '<text x="20" y="42" font-size="10" font-weight="700" fill="var(--ambar)">TEST F1 (nunca visto)</text>';
   const tx = ox + 10 + fw, tw = ow - 20 - fw, tcx = (tx + tw / 2).toFixed(1);
   if (nested) {
-    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#c2703c">Bucle interno · 3 folds (optimizacion)</text>';
+    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="var(--terracota)">Bucle interno · 3 folds (optimizacion)</text>';
     const iw = (tw - 24) / 3;
     for (let i = 0; i < 3; i++) {
-      g += '<rect x="' + (tx + 12 + i * iw).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (iw - 4).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(194,112,60,.1)" stroke="rgba(194,112,60,.55)" stroke-dasharray="4 3"/>' +
-        '<text x="' + (tx + 12 + i * iw + iw / 2 - 2).toFixed(1) + '" y="' + (oy + oh / 2 - 24) + '" text-anchor="middle" fill="#c2703c">val ' + (i + 1) + "</text>";
+      g += '<rect x="' + (tx + 12 + i * iw).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (iw - 4).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(168,92,51,.07)" stroke="rgba(168,92,51,.42)" stroke-dasharray="4 3"/>' +
+        '<text x="' + (tx + 12 + i * iw + iw / 2 - 2).toFixed(1) + '" y="' + (oy + oh / 2 - 24) + '" text-anchor="middle" fill="var(--terracota)">val ' + (i + 1) + "</text>";
     }
-    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + oh - 38) + '" width="' + (tw - 24).toFixed(1) + '" height="22" rx="8" fill="rgba(251,191,36,.2)" stroke="#fbbf24"/>' +
-      '<text x="' + tcx + '" y="' + (oy + oh - 23) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">modelo final → 88% insesgado</text>';
+    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + oh - 38) + '" width="' + (tw - 24).toFixed(1) + '" height="22" rx="8" fill="rgba(240,180,41,.13)" stroke="var(--ambar)"/>' +
+      '<text x="' + tcx + '" y="' + (oy + oh - 23) + '" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ambar)">modelo final → 88% insesgado</text>';
   } else {
-    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#ef5350">Sin anidar: el mismo fold elige y evalua</text>';
-    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (tw - 24).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(239,83,80,.12)" stroke="rgba(239,83,80,.6)" stroke-dasharray="5 4"/>' +
-      '<text x="' + tcx + '" y="' + (oy + 92) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#ef5350">GridSearchCV elige el mejor</text>' +
-      '<text x="' + tcx + '" y="' + (oy + 112) + '" text-anchor="middle" font-size="10" fill="#ffb4a6">y ese mismo score se reporta</text>' +
-      '<text x="' + tcx + '" y="' + (oy + oh - 26) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#ef5350">94% → optimista (+6 pts)</text>';
+    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="var(--brasa)">Sin anidar: el mismo fold elige y evalua</text>';
+    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (tw - 24).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(217,74,69,.08)" stroke="rgba(217,74,69,.42)" stroke-dasharray="5 4"/>' +
+      '<text x="' + tcx + '" y="' + (oy + 92) + '" text-anchor="middle" font-size="11" font-weight="700" fill="var(--brasa)">GridSearchCV elige el mejor</text>' +
+      '<text x="' + tcx + '" y="' + (oy + 112) + '" text-anchor="middle" font-size="10" fill="#c98f84">y ese mismo score se reporta</text>' +
+      '<text x="' + tcx + '" y="' + (oy + oh - 26) + '" text-anchor="middle" font-size="12" font-weight="800" fill="var(--brasa)">94% → optimista (+6 pts)</text>';
   }
   $("#nestChart").innerHTML = g;
   $("#nestMode").textContent = nested ? "Nested CV · insesgado" : "Optimización plana · sesgo optimista";
