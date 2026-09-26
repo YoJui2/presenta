@@ -12,7 +12,12 @@ const std = a => { const m = mean(a); return Math.sqrt(mean(a.map(v => (v - m) *
 const fmt = (n, d) => n.toFixed(d === undefined ? 1 : d);
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 function rng(seed) { let s = (seed >>> 0) || 12345; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
-function paintSlider(el) { if (!el) return; el.style.setProperty("--fill", ((el.value - el.min) / (el.max - el.min) * 100) + "%"); }
+function paintSlider(el) {
+  if (!el) return;
+  el.style.setProperty("--fill", ((el.value - el.min) / (el.max - el.min) * 100) + "%");
+  const n = el.parentNode && el.parentNode.querySelector("input.num");
+  if (n && document.activeElement !== n) n.value = el.value;
+}
 
 /* Resaltado de sintaxis Python — una sola pasada para no romper el HTML generado */
 const PY_RE = /(#[^\n]*)|("""[\s\S]*?"""|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|\b(def|return|for|in|if|elif|else|import|from|as|print|with|True|False|None|not|and|or|class)\b|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)(?=\()/g;
@@ -24,6 +29,36 @@ function hl(code) {
     if (n) return '<span class="n">' + n + "</span>";
     if (f) return '<span class="f">' + f + "</span>";
     return m;
+  });
+}
+/* ---------- Cajas numéricas editables junto a cada deslizador ---------- */
+function editableNumbers(root) {
+  $$(".ctrl", root || document).forEach(ctrl => {
+    const r = $("input[type=range]", ctrl), o = $("output", ctrl);
+    if (!r || !o || o.parentNode.querySelector("input.num")) return;
+    const n = document.createElement("input");
+    n.type = "number"; n.className = "num"; n.min = r.min; n.max = r.max; n.step = r.step || 1;
+    n.value = r.value;
+    n.title = "Escribí el valor o usá las flechas del teclado";
+    n.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); n.blur(); go(idx + 1); }
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        const d = (e.key === "ArrowUp" ? 1 : -1) * (e.shiftKey ? 5 : 1) * (+n.step || 1);
+        n.value = clamp((+n.value || 0) + d, +r.min, +r.max);
+        r.value = n.value; r.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    });
+    n.addEventListener("input", () => {
+      if (n.value === "" || !isFinite(+n.value)) return;
+      r.value = clamp(+n.value, +r.min, +r.max);
+      r.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    n.addEventListener("blur", () => { n.value = r.value; });
+    r.addEventListener("input", () => { if (document.activeElement !== n) n.value = r.value; });
+    const g = document.createElement("span");
+    g.className = "vpair";
+    o.after(g); g.appendChild(o); g.appendChild(n);
   });
 }
 function copyText(txt, btn) {
@@ -162,16 +197,16 @@ function gapUpdate() {
   $("#gapBarCvV").textContent = c + "%";
   const v = $("#gapVerdict");
   if (d >= 8) {
-    v.className = "note rose";
+    v.className = "note ember";
     v.innerHTML = "<strong>Sobreajuste (overfitting).</strong> Brecha de <em>" + d + " puntos</em>: el modelo memorizó el entrenamiento y perdió capacidad predictiva. Solución: más regularización, menos complejidad o más datos.";
   } else if (d <= 2 && t < 70) {
-    v.className = "note amber";
+    v.className = "note copper";
     v.innerHTML = "<strong>Subajuste (underfitting).</strong> Train " + t + "% y CV " + c + "%: poco rendimiento en ambos. Solución: modelo más complejo, más features o menos regularización.";
   } else if (d <= 3) {
-    v.className = "note cyan";
+    v.className = "note gold";
     v.innerHTML = "<strong>Equilibrado.</strong> Brecha de sólo " + d + " punto" + (d === 1 ? "" : "s") + ": el modelo generaliza. Reportá <code>media ± σ</code> sobre los folds.";
   } else {
-    v.className = "note amber";
+    v.className = "note copper";
     v.innerHTML = "<strong>Zona intermedia (brecha de " + d + " pts).</strong> Hay sobreajuste leve: conviene ajustar la regularización o el tamaño del modelo y volver a medir.";
   }
 }
@@ -224,10 +259,10 @@ function labUpdate() {
   const dev = (Math.max.apply(null, props) - Math.min.apply(null, props)) * 100;
   const w = $("#labWarn");
   if (strat) {
-    w.className = "note cyan";
+    w.className = "note gold";
     w.innerHTML = "<strong>Stratified K-Fold activo:</strong> cada fold conserva la proporción global de aprobaciones (~40%). Imprescindible con clases desbalanceadas. Dispersión entre folds: <em>" + dev.toFixed(1) + " pts</em>.";
   } else {
-    w.className = "note " + (dev > 12 ? "rose" : "amber");
+    w.className = "note " + (dev > 12 ? "ember" : "copper");
     w.innerHTML = "<strong>K-Fold estándar:</strong> la proporción de positivos varía entre folds (dispersión de <em>" + dev.toFixed(1) + " pts</em>). " +
       (dev > 12 ? "Un fold queda claramente sesgado: <strong>usá Stratified K-Fold</strong>." : "Con muchas observaciones el efecto se atenúa, pero el sesgo sigue presente.");
   }
@@ -258,7 +293,7 @@ exVals.forEach((v, i) => {
   const d = document.createElement("div");
   d.className = "ctrl";
   d.innerHTML = '<div class="ctrl-top"><label>Accuracy fold ' + (i + 1) + "</label><output>" + v + "%</output></div>" +
-    '<input type="range" min="40" max="100" step="1" value="' + v + '" class="' + (i % 2 ? "cyan" : "violet") + '">';
+    '<input type="range" min="40" max="100" step="1" value="' + v + '" class="' + (i % 2 ? "gold" : "clay") + '">';
   exSliders.appendChild(d);
   paintSlider(d.querySelector("input"));
   d.querySelector("input").addEventListener("input", exUpdate);
@@ -271,9 +306,9 @@ function exUpdate() {
   $("#exStd").textContent = "±" + fmt(s) + "%";
   $("#exRange").textContent = Math.min.apply(null, vals) + "–" + Math.max.apply(null, vals);
   const v = $("#exVerdict");
-  if (s <= 2) { v.className = "note cyan"; v.innerHTML = "<strong>Estable.</strong> σ = ±" + fmt(s) + ": el modelo rinde igual en cualquier grupo de estudiantes. El <strong>" + fmt(m) + "%</strong> es un número en el que podés confiar."; }
+  if (s <= 2) { v.className = "note gold"; v.innerHTML = "<strong>Estable.</strong> σ = ±" + fmt(s) + ": el modelo rinde igual en cualquier grupo de estudiantes. El <strong>" + fmt(m) + "%</strong> es un número en el que podés confiar."; }
   else if (s <= 5) { v.className = "note"; v.innerHTML = "<strong>Aceptable.</strong> σ = ±" + fmt(s) + ": hay variaciones entre grupos. Conviene reportar el rango " + Math.min.apply(null, vals) + "%–" + Math.max.apply(null, vals) + "%."; }
-  else { v.className = "note rose"; v.innerHTML = "<strong>Inestable.</strong> σ = ±" + fmt(s) + ": el resultado depende mucho del grupo evaluado. Revisá el preprocesamiento y la estratificación."; }
+  else { v.className = "note ember"; v.innerHTML = "<strong>Inestable.</strong> σ = ±" + fmt(s) + ": el resultado depende mucho del grupo evaluado. Revisá el preprocesamiento y la estratificación."; }
   renderFolds($("#exFolds"), { n: 100, k: 5, seed: 3, strat: true, active: { test: 0, train: [1, 2, 3, 4] } });
 }
 
@@ -301,22 +336,22 @@ function stChart(box, vals, color) {
   let g = '<svg class="scg2" viewBox="0 0 ' + W + " 88" + '" preserveAspectRatio="xMidYMid meet" role="img">';
   [50, 70, 90].forEach(v => {
     g += '<line x1="' + x0 + '" y1="' + y(v).toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y(v).toFixed(1) + '" stroke="rgba(255,255,255,.08)"/>' +
-      '<text x="' + (x0 - 3) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" font-size="7" fill="#6f78a0">' + v + "</text>";
+      '<text x="' + (x0 - 3) + '" y="' + (y(v) + 3).toFixed(1) + '" text-anchor="end" font-size="7" fill="#9b7e67">' + v + "</text>";
   });
   vals.forEach((v, i) => {
     const x = x0 + i * (bw + gap), yy = y(v);
     g += '<rect x="' + x + '" y="' + yy.toFixed(1) + '" width="' + bw + '" height="' + (base - yy).toFixed(1) + '" rx="4" fill="' + color + '" opacity=".82"/>' +
-      '<text x="' + (x + bw / 2) + '" y="' + (base + 12) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#98a1c7">F' + (i + 1) + "</text>";
+      '<text x="' + (x + bw / 2) + '" y="' + (base + 12) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#c9a992">F' + (i + 1) + "</text>";
   });
-  g += '<line x1="' + x0 + '" y1="' + y(m).toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y(m).toFixed(1) + '" stroke="var(--cyan)" stroke-width="1.8" stroke-dasharray="5 3"/>';
+  g += '<line x1="' + x0 + '" y1="' + y(m).toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y(m).toFixed(1) + '" stroke="var(--ambar)" stroke-width="1.8" stroke-dasharray="5 3"/>';
   g += "</svg>";
-  g += '<div class="foot" style="margin-top:.1em">media <strong style="color:var(--cyan)">' + fmt(m) + "%</strong> · σ ±" + fmt(s) +
+  g += '<div class="foot" style="margin-top:.1em">media <strong style="color:var(--ambar)">' + fmt(m) + "%</strong> · σ ±" + fmt(s) +
     " · rango " + Math.min.apply(null, vals) + "–" + Math.max.apply(null, vals) + "</div>";
   box.innerHTML = g;
 }
 function stVerdict(el, m, s, label) {
   const cv = s / m * 100;
-  el.className = "note " + (s <= 2 ? "cyan" : s <= 5 ? "" : "rose");
+  el.className = "note " + (s <= 2 ? "gold" : s <= 5 ? "" : "ember");
   el.innerHTML = "<strong>" + label + "</strong> — media " + fmt(m) + "%, σ ±" + fmt(s) + " (" + fmt(cv) + "% de coeficiente de variación). " +
     (s <= 2 ? "Alta fiabilidad en producción y baja sensibilidad a las variaciones muestrales."
       : s <= 5 ? "Aceptable para producción."
@@ -326,8 +361,8 @@ function stUpdate() {
   const a = $$("#stSlidersA input").map(i => +i.value), b = $$("#stSlidersB input").map(i => +i.value);
   $$("#stSlidersA output").forEach((o, i) => o.textContent = a[i] + "%");
   $$("#stSlidersB output").forEach((o, i) => o.textContent = b[i] + "%");
-  stChart($("#stChartA"), a, "var(--cyan)");
-  stChart($("#stChartB"), b, "var(--rose)");
+  stChart($("#stChartA"), a, "var(--ambar)");
+  stChart($("#stChartB"), b, "var(--brasa)");
   $("#stMeanA").textContent = fmt(mean(a)) + "%";
   $("#stSdA").textContent = "±" + fmt(std(a));
   $("#stMeanB").textContent = fmt(mean(b)) + "%";
@@ -335,8 +370,8 @@ function stUpdate() {
   stVerdict($("#stVerdictA"), mean(a), std(a), "Modelo A");
   stVerdict($("#stVerdictB"), mean(b), std(b), "Modelo B");
 }
-stBuild($("#stSlidersA"), stDefA, "cyan");
-stBuild($("#stSlidersB"), stDefB, "rose");
+stBuild($("#stSlidersA"), stDefA, "gold");
+stBuild($("#stSlidersB"), stDefB, "ember");
 $("#stReset").onclick = () => {
   $$("#stSlidersA input").forEach((el, i) => { el.value = stDefA[i]; paintSlider(el); });
   $$("#stSlidersB input").forEach((el, i) => { el.value = stDefB[i]; paintSlider(el); });
@@ -360,7 +395,7 @@ const STRATS = [
   { n: "Group K-Fold", d: "Un grupo nunca se parte entre folds", p: "Correcto con datos agrupados o repetidos", m: "Requiere una variable grupal identificadora", u: "Pacientes, usuarios, mediciones repetidas", c: "Las tres observaciones del mismo grupo (mismo color) se quedan juntas: el grupo resaltado es test completo y nunca se divide entre train y test." }
 ];
 /* Mini-gráficos: cada técnica con su propio diagrama de particionado */
-const VI = "var(--violet)", CY = "var(--cyan)";
+const VI = "var(--terracota)", CY = "var(--ambar)";
 function rc(x, y, w, h, fill, op) {
   return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="2.5" fill="' + fill + '"' + (op ? ' opacity="' + op + '"' : "") + "/>";
 }
@@ -429,15 +464,15 @@ function stratDetail(i) {
   const s = STRATS[i];
   $("#stratDetail").innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px">' +
-    '<h3 style="margin:0">' + s.n + ' <span class="badge b-violet" style="vertical-align:middle">' + s.d + "</span></h3>" +
-    '<span class="badge b-cyan">Cuándo usarlo</span></div>' +
+    '<h3 style="margin:0">' + s.n + ' <span class="badge b-clay" style="vertical-align:middle">' + s.d + "</span></h3>" +
+    '<span class="badge b-gold">Cuándo usarlo</span></div>' +
     '<div class="split g-1-2" style="gap:18px;align-items:center">' +
     '<svg class="scg" style="margin:0" viewBox="0 0 200 64" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagrama de ' + s.n + '">' + STRAT_VIS[i]() + "</svg>" +
     '<div class="grid" style="gap:8px">' +
     '<div class="grid g3">' +
-    '<div class="note cyan"><strong>(+) Ventaja</strong><br>' + s.p + "</div>" +
-    '<div class="note rose"><strong>(−) Limitación</strong><br>' + s.m + "</div>" +
-    '<div class="note amber"><strong>Casos de uso</strong><br>' + s.u + "</div></div>" +
+    '<div class="note gold"><strong>(+) Ventaja</strong><br>' + s.p + "</div>" +
+    '<div class="note ember"><strong>(−) Limitación</strong><br>' + s.m + "</div>" +
+    '<div class="note copper"><strong>Casos de uso</strong><br>' + s.u + "</div></div>" +
     '<div class="note"><strong>Qué muestra el gráfico:</strong> ' + s.c + "</div></div></div>";
 }
 stratDetail(1);
@@ -464,18 +499,18 @@ function metricUpdate() {
     '<div class="hd v">Real −</div>' +
     '<div class="cellbox fp"><div class="n">' + fp + '</div><div class="t">FP · falso positivo</div></div>' +
     '<div class="cellbox tn"><div class="n">' + tn + '</div><div class="t">VN · acierto</div></div>';
-  const bars = [["Accuracy", acc, "var(--cyan)"], ["Precision", pre, "var(--violet)"], ["Recall", rec, "var(--amber)"], ["F1-score", f1, "var(--rose)"]];
+  const bars = [["Accuracy", acc, "var(--ambar)"], ["Precision", pre, "var(--terracota)"], ["Recall", rec, "var(--cobre)"], ["F1-score", f1, "var(--brasa)"]];
   $("#metricBars").innerHTML = bars.map(b =>
     '<div class="bar"><span class="nm">' + b[0] + '</span><span class="track"><i class="fill" style="width:' + (b[1] * 100).toFixed(1) +
     "%;background:linear-gradient(90deg," + b[2] + ",rgba(255,255,255,.4))\"></i></span><span class=\"val\" style=\"color:" + b[2] + '">' + pct(b[1] * 100) + "</span></div>"
   ).join("");
   const posReal = tp + fn, recReal = posReal ? tp / posReal : 0;
   const n = $("#metricNote");
-  let msg, cls = "note cyan";
+  let msg, cls = "note gold";
   if (rec >= .9 && pre >= .8) { msg = "<strong>Excelente equilibrio.</strong> Alta cobertura y alta precisión: el modelo sirve para automatizar la decisión."; }
-  else if (rec >= .85 && pre < .7) { msg = "<strong>Prioriza cobertura (Recall " + pct(rec * 100) + ").</strong> Casi no se le escapa un positivo, a costa de falsos positivos. Típico en <em>fraude o diagnóstico médico</em>: preferís avisar de más."; cls = "note amber"; }
+  else if (rec >= .85 && pre < .7) { msg = "<strong>Prioriza cobertura (Recall " + pct(rec * 100) + ").</strong> Casi no se le escapa un positivo, a costa de falsos positivos. Típico en <em>fraude o diagnóstico médico</em>: preferís avisar de más."; cls = "note copper"; }
   else if (pre >= .85 && rec < .7) { msg = "<strong>Prioriza precisión (Precision " + pct(pre * 100) + ").</strong> Cuando dice que sí, acierta, pero se le escapan positivos reales. Típico en <em>recomendaciones o filtrado de spam</em>."; }
-  else if (acc > .9 && recReal < .3) { msg = "<strong>Accuracy engañosa.</strong> Accuracy " + pct(acc * 100) + " pero sólo " + pct(recReal * 100) + " de los positivos reales se detectan: el desbalanceo de clases infla la métrica. Usá F1, recall o ROC-AUC."; cls = "note rose"; }
+  else if (acc > .9 && recReal < .3) { msg = "<strong>Accuracy engañosa.</strong> Accuracy " + pct(acc * 100) + " pero sólo " + pct(recReal * 100) + " de los positivos reales se detectan: el desbalanceo de clases infla la métrica. Usá F1, recall o ROC-AUC."; cls = "note ember"; }
   else { msg = "<strong>Rendimiento moderado.</strong> Revisá el balance entre precisión y recall según el costo de cada tipo de error."; cls = "note"; }
   n.className = cls; n.innerHTML = msg;
 }
@@ -525,20 +560,20 @@ function bvDraw() {
       '<text x="' + (L - 8) + '" y="' + (Y(v) + 3).toFixed(1) + '" text-anchor="end">' + Math.round(v * 100) + "%</text>";
   }
   g += '<rect x="' + X(5).toFixed(1) + '" y="' + T + '" width="' + (X(10) - X(5)).toFixed(1) + '" height="' + (H - T - B) +
-    '" fill="rgba(124,92,255,.14)" stroke="rgba(124,92,255,.45)" stroke-dasharray="4 4"/>';
-  g += '<text class="strong" x="' + ((X(5) + X(10)) / 2).toFixed(1) + '" y="' + (T + 13) + '" text-anchor="middle" fill="#a78bfa">zona 5–10</text>';
+    '" fill="rgba(249,115,22,.14)" stroke="rgba(249,115,22,.45)" stroke-dasharray="4 4"/>';
+  g += '<text class="strong" x="' + ((X(5) + X(10)) / 2).toFixed(1) + '" y="' + (T + 13) + '" text-anchor="middle" fill="#c2703c">zona 5–10</text>';
   for (let v = 2; v <= 20; v += 2) g += '<text x="' + X(v).toFixed(1) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + v + "</text>";
-  g += '<text class="strong" x="' + ((L + W - R) / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#98a1c7">k · número de folds</text>';
+  g += '<text class="strong" x="' + ((L + W - R) / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#c9a992">k · número de folds</text>';
   g += '<line class="axis" x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (H - B) + '"/>' +
     '<line class="axis" x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '"/>';
-  [[P_BIAS, "#fb5f7f", 2], [P_VAR, "#fbbf24", 2], [P_TOT, "#22d3ee", 3]].forEach(s => {
+  [[P_BIAS, "#ef5350", 2], [P_VAR, "#f59e0b", 2], [P_TOT, "#fbbf24", 3]].forEach(s => {
     const pts = [];
     for (let v = 2; v <= 20; v += .25) pts.push([X(v), Y(interp(s[0], v))]);
     g += '<path d="' + smoothPath(pts) + '" fill="none" stroke="' + s[1] + '" stroke-width="' + s[2] + '" stroke-linecap="round" opacity=".92"/>';
   });
   const ky = Y(interp(P_TOT, k)).toFixed(1);
   g += '<line x1="' + X(k).toFixed(1) + '" y1="' + T + '" x2="' + X(k).toFixed(1) + '" y2="' + (H - B) + '" stroke="rgba(255,255,255,.28)" stroke-dasharray="3 4"/>';
-  g += '<circle cx="' + X(k).toFixed(1) + '" cy="' + ky + '" r="6" fill="#fff" stroke="#22d3ee" stroke-width="3"/>';
+  g += '<circle cx="' + X(k).toFixed(1) + '" cy="' + ky + '" r="6" fill="#fff" stroke="#fbbf24" stroke-width="3"/>';
   g += '<text class="strong" x="' + X(k).toFixed(1) + '" y="' + (parseFloat(ky) - 14).toFixed(1) + '" text-anchor="middle" fill="#fff">k=' + k + "</text>";
   $("#bvChart").innerHTML = g;
   $("#bvKOut").textContent = k;
@@ -546,14 +581,14 @@ function bvDraw() {
   $("#bvEvals").textContent = k;
   const trainPct = Math.round((k - 1) / k * 100), t = $("#bvText"), card = $("#bvVerdict");
   if (k <= 3) {
-    card.style.borderColor = "rgba(251,95,127,.5)";
-    t.innerHTML = "<strong style='color:var(--rose)'>k = " + k + ": alto sesgo pesimista.</strong> El modelo se entrena con sólo " + trainPct + "% de los datos, así que la métrica <em>subestima</em> el desempeño real. A cambio, la varianza es baja: estimación estable pero pesimista.";
+    card.style.borderColor = "rgba(239,83,80,.5)";
+    t.innerHTML = "<strong style='color:var(--brasa)'>k = " + k + ": alto sesgo pesimista.</strong> El modelo se entrena con sólo " + trainPct + "% de los datos, así que la métrica <em>subestima</em> el desempeño real. A cambio, la varianza es baja: estimación estable pero pesimista.";
   } else if (k <= 10) {
-    card.style.borderColor = "rgba(34,211,238,.5)";
-    t.innerHTML = "<strong style='color:var(--cyan)'>k = " + k + ": punto óptimo empírico.</strong> Entrenamiento con " + trainPct + "%, " + k + " evaluaciones y un compromiso equilibrado entre sesgo moderado y varianza controlada. Recomendado por Hastie et al. (2009) y Kohavi (1995).";
-  } else {
     card.style.borderColor = "rgba(251,191,36,.5)";
-    t.innerHTML = "<strong style='color:var(--amber)'>k = " + k + ": varianza elevada.</strong> Cada fold aporta muy poca información nueva y las estimaciones quedan altamente correlacionadas. Si k tiende a N tenés LOOCV: insesgado pero carísimo.";
+    t.innerHTML = "<strong style='color:var(--ambar)'>k = " + k + ": punto óptimo empírico.</strong> Entrenamiento con " + trainPct + "%, " + k + " evaluaciones y un compromiso equilibrado entre sesgo moderado y varianza controlada. Recomendado por Hastie et al. (2009) y Kohavi (1995).";
+  } else {
+    card.style.borderColor = "rgba(251,146,60,.55)";
+    t.innerHTML = "<strong style='color:var(--cobre)'>k = " + k + ": varianza elevada.</strong> Cada fold aporta muy poca información nueva y las estimaciones quedan altamente correlacionadas. Si k tiende a N tenés LOOCV: insesgado pero carísimo.";
   }
 }
 bvK.addEventListener("input", bvDraw);
@@ -610,21 +645,21 @@ function leakDraw() {
   const names = ["Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"];
   let h = '<div class="foldwrap" style="gap:7px">';
   names.forEach((f, i) => {
-    h += '<div class="fold" style="padding:.5em .6em;border-color:' + (leakCorrect ? "rgba(34,211,238,.4)" : "rgba(251,95,127,.4)") + '">' +
+    h += '<div class="fold" style="padding:.5em .6em;border-color:' + (leakCorrect ? "rgba(251,191,36,.4)" : "rgba(239,83,80,.4)") + '">' +
       '<div class="fname" style="margin:0"><span>' + f + "</span><em>" + (i === 0 ? "prueba" : "entrenamiento") + "</em></div>" +
-      '<div style="height:14px;border-radius:6px;margin-top:5px;background:repeating-linear-gradient(115deg,rgba(167,139,250,.45) 0 5px,rgba(167,139,250,.12) 5px 10px)"></div></div>';
+      '<div style="height:14px;border-radius:6px;margin-top:5px;background:repeating-linear-gradient(115deg,rgba(194,112,60,.45) 0 5px,rgba(194,112,60,.12) 5px 10px)"></div></div>';
   });
   h += "</div>";
   h += '<div style="margin-top:16px;position:relative;height:76px">';
   if (leakCorrect) {
-    h += '<div style="position:absolute;left:8%;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--primary2));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#04121a">StandardScaler.fit() + modelo</div>' +
+    h += '<div style="position:absolute;left:8%;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--ambar),var(--dorado));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#2a1200">StandardScaler.fit() + modelo</div>' +
       '<div style="position:absolute;left:0;right:0;top:42px;text-align:center;font-size:.7rem;color:var(--muted)">se ajusta sólo sobre los folds de entrenamiento (80%)</div>';
   } else {
-    h += '<div style="position:absolute;left:0;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--rose),var(--orange));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#1a0710">StandardScaler.fit() sobre TODO X</div>' +
+    h += '<div style="position:absolute;left:0;right:0;top:4px;height:30px;border-radius:9px;background:linear-gradient(90deg,var(--brasa),var(--miel));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#2a0d05">StandardScaler.fit() sobre TODO X</div>' +
       '<div style="position:absolute;left:0;right:0;top:42px;text-align:center;font-size:.7rem;color:var(--muted)">incluye el fold de prueba → la media y la varianza se filtran</div>';
   }
   h += "</div>";
-  h += '<div class="note ' + (leakCorrect ? "cyan" : "rose") + '">' +
+  h += '<div class="note ' + (leakCorrect ? "gold" : "ember") + '">' +
     (leakCorrect
       ? "<strong>Pipeline:</strong> el transformador se re-entrena en cada iteración sobre el 80% de entrenamiento. La métrica refleja lo que pasa en producción."
       : "<strong>Fuga de información:</strong> el fold de prueba participó del ajuste del escalador, así que el modelo ya conoce su media y varianza antes de ser evaluado.") +
@@ -647,30 +682,30 @@ function nestDraw() {
   for (let i = 0; i < 5; i++) {
     const isTest = i === 0;
     g += '<rect x="' + (ox + 10 + i * fw).toFixed(1) + '" y="' + (oy + 10) + '" width="' + (fw - 4).toFixed(1) + '" height="' + (oh - 20) + '" rx="9" fill="' +
-      (isTest ? "rgba(34,211,238,.16)" : "rgba(255,255,255,.03)") + '" stroke="' + (isTest ? "#22d3ee" : "rgba(255,255,255,.14)") + '" stroke-width="' + (isTest ? 2 : 1) + '"/>' +
-      '<text x="' + (ox + 10 + i * fw + fw / 2 - 2).toFixed(1) + '" y="' + (oy + oh - 14) + '" text-anchor="middle" fill="' + (isTest ? "#22d3ee" : "#98a1c7") + '">F' + (i + 1) + "</text>";
+      (isTest ? "rgba(251,191,36,.16)" : "rgba(255,255,255,.03)") + '" stroke="' + (isTest ? "#fbbf24" : "rgba(255,255,255,.14)") + '" stroke-width="' + (isTest ? 2 : 1) + '"/>' +
+      '<text x="' + (ox + 10 + i * fw + fw / 2 - 2).toFixed(1) + '" y="' + (oy + oh - 14) + '" text-anchor="middle" fill="' + (isTest ? "#fbbf24" : "#c9a992") + '">F' + (i + 1) + "</text>";
   }
-  g += '<text x="20" y="42" font-size="10" font-weight="700" fill="#22d3ee">TEST F1 (nunca visto)</text>';
+  g += '<text x="20" y="42" font-size="10" font-weight="700" fill="#fbbf24">TEST F1 (nunca visto)</text>';
   const tx = ox + 10 + fw, tw = ow - 20 - fw, tcx = (tx + tw / 2).toFixed(1);
   if (nested) {
-    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#a78bfa">Bucle interno · 3 folds (optimizacion)</text>';
+    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#c2703c">Bucle interno · 3 folds (optimizacion)</text>';
     const iw = (tw - 24) / 3;
     for (let i = 0; i < 3; i++) {
-      g += '<rect x="' + (tx + 12 + i * iw).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (iw - 4).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>' +
-        '<text x="' + (tx + 12 + i * iw + iw / 2 - 2).toFixed(1) + '" y="' + (oy + oh / 2 - 24) + '" text-anchor="middle" fill="#a78bfa">val ' + (i + 1) + "</text>";
+      g += '<rect x="' + (tx + 12 + i * iw).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (iw - 4).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(194,112,60,.1)" stroke="rgba(194,112,60,.55)" stroke-dasharray="4 3"/>' +
+        '<text x="' + (tx + 12 + i * iw + iw / 2 - 2).toFixed(1) + '" y="' + (oy + oh / 2 - 24) + '" text-anchor="middle" fill="#c2703c">val ' + (i + 1) + "</text>";
     }
-    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + oh - 38) + '" width="' + (tw - 24).toFixed(1) + '" height="22" rx="8" fill="rgba(34,211,238,.2)" stroke="#22d3ee"/>' +
-      '<text x="' + tcx + '" y="' + (oy + oh - 23) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#22d3ee">modelo final → 88% insesgado</text>';
+    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + oh - 38) + '" width="' + (tw - 24).toFixed(1) + '" height="22" rx="8" fill="rgba(251,191,36,.2)" stroke="#fbbf24"/>' +
+      '<text x="' + tcx + '" y="' + (oy + oh - 23) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">modelo final → 88% insesgado</text>';
   } else {
-    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#fb5f7f">Sin anidar: el mismo fold elige y evalua</text>';
-    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (tw - 24).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(251,95,127,.12)" stroke="rgba(251,95,127,.6)" stroke-dasharray="5 4"/>' +
-      '<text x="' + tcx + '" y="' + (oy + 92) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#fb5f7f">GridSearchCV elige el mejor</text>' +
-      '<text x="' + tcx + '" y="' + (oy + 112) + '" text-anchor="middle" font-size="10" fill="#ffb3c2">y ese mismo score se reporta</text>' +
-      '<text x="' + tcx + '" y="' + (oy + oh - 26) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#fb5f7f">94% → optimista (+6 pts)</text>';
+    g += '<text x="' + (tx + 12).toFixed(1) + '" y="42" font-size="10" font-weight="700" fill="#ef5350">Sin anidar: el mismo fold elige y evalua</text>';
+    g += '<rect x="' + (tx + 12).toFixed(1) + '" y="' + (oy + 48) + '" width="' + (tw - 24).toFixed(1) + '" height="' + (oh - 92) + '" rx="9" fill="rgba(239,83,80,.12)" stroke="rgba(239,83,80,.6)" stroke-dasharray="5 4"/>' +
+      '<text x="' + tcx + '" y="' + (oy + 92) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#ef5350">GridSearchCV elige el mejor</text>' +
+      '<text x="' + tcx + '" y="' + (oy + 112) + '" text-anchor="middle" font-size="10" fill="#ffb4a6">y ese mismo score se reporta</text>' +
+      '<text x="' + tcx + '" y="' + (oy + oh - 26) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#ef5350">94% → optimista (+6 pts)</text>';
   }
   $("#nestChart").innerHTML = g;
   $("#nestMode").textContent = nested ? "Nested CV · insesgado" : "Optimización plana · sesgo optimista";
-  $("#nestMode").className = "badge " + (nested ? "b-cyan" : "b-rose");
+  $("#nestMode").className = "badge " + (nested ? "b-gold" : "b-ember");
   $("#nestToggle").textContent = nested ? "Ver sin anidar" : "Ver con anidar";
 }
 $("#nestToggle").onclick = () => { nested = !nested; nestDraw(); };
@@ -691,7 +726,7 @@ const SK = {
       'print("Accuracy promedio:", scores.mean())',
       'print("Desviacion estandar:", scores.std())'
     ].join("\n"),
-    info: "<h3>Evaluación rápida de una métrica</h3><p>Devuelve un array con la métrica de cada fold. Es la vía más corta para obtener <code>media</code> y <code>σ</code>.</p><ul><li><code>cv=5</code> o <code>cv=KFold(...)</code></li><li><code>n_jobs=-1</code> para paralelizar</li><li><code>scoring</code>: 'accuracy', 'f1_macro', 'roc_auc', 'neg_mean_squared_error'…</li></ul><div class='note cyan'>Siempre reportá <strong>media ± σ</strong>: un 90% con σ ±0,7 es confiable; con σ ±12 es una lotería.</div>"
+    info: "<h3>Evaluación rápida de una métrica</h3><p>Devuelve un array con la métrica de cada fold. Es la vía más corta para obtener <code>media</code> y <code>σ</code>.</p><ul><li><code>cv=5</code> o <code>cv=KFold(...)</code></li><li><code>n_jobs=-1</code> para paralelizar</li><li><code>scoring</code>: 'accuracy', 'f1_macro', 'roc_auc', 'neg_mean_squared_error'…</li></ul><div class='note gold'>Siempre reportá <strong>media ± σ</strong>: un 90% con σ ±0,7 es confiable; con σ ±12 es una lotería.</div>"
   },
   t2: {
     name: "cross_validate",
@@ -708,7 +743,7 @@ const SK = {
       'print("Test F1 Macro :", cv_results[\'test_f1_macro\'].mean())',
       'print("Train F1 Macro:", cv_results[\'train_f1_macro\'].mean())  # audita overfitting'
     ].join("\n"),
-    info: "<h3>Varias métricas + auditoría</h3><p><code>return_train_score=True</code> es la clave: te da el score de entrenamiento para compararlo con el de prueba y <strong>detectar sobreajuste</strong>.</p><div class='note amber'>Si <code>train − test &gt; 8 pts</code> en F1, estás sobreajustando.</div><div class='note rose' style='margin-top:8px'>Nunca apliques el preprocesamiento fuera del CV: encapsulalo en un <strong>Pipeline</strong>.</div>"
+    info: "<h3>Varias métricas + auditoría</h3><p><code>return_train_score=True</code> es la clave: te da el score de entrenamiento para compararlo con el de prueba y <strong>detectar sobreajuste</strong>.</p><div class='note copper'>Si <code>train − test &gt; 8 pts</code> en F1, estás sobreajustando.</div><div class='note ember' style='margin-top:8px'>Nunca apliques el preprocesamiento fuera del CV: encapsulalo en un <strong>Pipeline</strong>.</div>"
   },
   t3: {
     name: "cross_val_predict",
@@ -723,7 +758,7 @@ const SK = {
       "print(confusion_matrix(y, y_pred_oof))",
       "print(classification_report(y, y_pred_oof))"
     ].join("\n"),
-    info: "<h3>Predicciones out-of-fold</h3><p>Devuelve una predicción por muestra, generada por el modelo que <em>no</em> la vio en el entrenamiento. Ideal para graficar la <strong>matriz de confusión agregada</strong> o los residuos en regresión.</p><div class='note rose'><strong>Advertencia metodológica:</strong> no debe usarse directamente para inferir el error de generalización estándar del modelo.</div>"
+    info: "<h3>Predicciones out-of-fold</h3><p>Devuelve una predicción por muestra, generada por el modelo que <em>no</em> la vio en el entrenamiento. Ideal para graficar la <strong>matriz de confusión agregada</strong> o los residuos en regresión.</p><div class='note ember'><strong>Advertencia metodológica:</strong> no debe usarse directamente para inferir el error de generalización estándar del modelo.</div>"
   },
   t4: {
     name: "splitters (sklearn.model_selection)",
@@ -772,7 +807,7 @@ const SK = {
       "outer_cv = KFold(n_splits=5, shuffle=True, random_state=42)",
       "print(cross_val_score(search, X, y, cv=outer_cv).mean())"
     ].join("\n"),
-    info: "<h3>El patrón correcto</h3><p>El <code>Pipeline</code> evita el Data Leakage: cada fold escala sus propios datos. El <strong>GridSearchCV</strong> con <code>cv=inner_cv</code> hace la búsqueda y el <code>cross_val_score</code> exterior mide sin sesgo.</p><div class='note cyan'>Ese es exactamente el esquema de la <strong>validación anidada</strong>.</div><div class='note amber' style='margin-top:8px'><code>GridSearchCV</code> sola devuelve un score <em>optimistamente sesgado</em>.</div>"
+    info: "<h3>El patrón correcto</h3><p>El <code>Pipeline</code> evita el Data Leakage: cada fold escala sus propios datos. El <strong>GridSearchCV</strong> con <code>cv=inner_cv</code> hace la búsqueda y el <code>cross_val_score</code> exterior mide sin sesgo.</p><div class='note gold'>Ese es exactamente el esquema de la <strong>validación anidada</strong>.</div><div class='note copper' style='margin-top:8px'><code>GridSearchCV</code> sola devuelve un score <em>optimistamente sesgado</em>.</div>"
   }
 };
 let skCur = "t1";
@@ -866,6 +901,7 @@ bvDraw();
 leakDraw();
 nestDraw();
 skShow("t1");
+editableNumbers();
 
 const start = parseInt((location.hash || "").replace("#", ""), 10);
 go(isFinite(start) && start > 0 ? start - 1 : 0);
