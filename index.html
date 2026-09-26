@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validación Cruzada · Presentación interactiva</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-segs" id="progressSegs"></div>
+
+<main id="deck">
+
+<!-- ============ 1 · PORTADA ============ -->
+<section class="slide" data-title="Portada">
+  <div class="cover">
+    <div class="inner">
+      <div class="badge-row">
+        <span class="badge b-violet">Aprendizaje Automático I</span>
+        <span class="badge b-cyan">Ciclo 2026</span>
+      </div>
+      <div class="kicker" style="justify-content:center">IESETyFP · Tecnicatura Superior en Ciencia de Datos e IA</div>
+      <h1>Validación Cruzada</h1>
+      <p class="lead" style="max-width:780px;margin:0 auto">Cómo estimamos de verdad si un modelo <em>generaliza</em> — y no solo si memoriza.</p>
+      <div class="float-folds"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="people">
+        <div class="person"><div class="r">Alumno</div><div class="n">Ravarotto, Iván Tomás</div></div>
+        <div class="person"><div class="r">Alumno</div><div class="n">Santagata, Julian Gabriel</div></div>
+        <div class="person"><div class="r">Alumna</div><div class="n">Drocezesky, Clara Denise</div></div>
+        <div class="person"><div class="r">Docente</div><div class="n">Di Nubila, Jose</div></div>
+      </div>
+      <div class="meta-row">
+        <span>Navegá con las flechas ← →</span>
+        <span>Los gráficos se manipulan en vivo</span>
+        <span><kbd>O</kbd> índice · <kbd>?</kbd> ayuda</span>
+      </div>
+    </div>
+  </div>
+  <div class="hint">Presentación interactiva · 14 secciones · sin instalar nada</div>
+</section>
+
+<!-- ============ 2 · EL PROBLEMA ============ -->
+<section class="slide" data-title="El problema: generalizar vs memorizar">
+  <div class="kicker"><b>01</b> El problema</div>
+  <h2>Un modelo no se evalúa con los datos que ya vio</h2>
+  <div class="split g-2-1">
+    <div class="grid">
+      <div class="card pad-lg">
+        <h3><span class="dot" style="background:var(--rose)"></span>El error más común</h3>
+        <p>Entrenar y medir el desempeño <strong>sobre el mismo conjunto de datos</strong>. El modelo memoriza los ejemplos y arroja métricas excelentes… que se desarman con datos nuevos.</p>
+        <div class="grid g2">
+          <div class="note rose"><strong>Sobreajuste (overfitting)</strong><br>Excelente en entrenamiento, pobre con datos nuevos.</div>
+          <div class="note amber"><strong>Subajuste (underfitting)</strong><br>Pobre en entrenamiento <em>y</em> en validación: le falta capacidad.</div>
+        </div>
+        <div class="note cyan" style="margin-top:10px"><strong>Regla práctica:</strong> el conjunto de prueba debe permanecer <em>intocable</em> hasta el final. La validación cruzada resuelve esto sin desperdiciar datos.</div>
+      </div>
+      <div class="card pad-lg">
+        <h3><span class="dot" style="background:var(--cyan)"></span>De qué hablamos exactamente</h3>
+        <ul>
+          <li><strong>Entrada (X):</strong> horas de estudio, asistencia, trabajos entregados.</li>
+          <li><strong>Etiqueta (y):</strong> aprueba / no aprueba.</li>
+          <li><strong>Salida esperada:</strong> una <em>estimación insesgada</em> del error de generalización.</li>
+        </ul>
+        <p style="margin-bottom:0">No buscamos el número más alto: buscamos el número <strong>más confiable</strong>.</p>
+      </div>
+    </div>
+    <div class="card pad-lg cyan">
+      <h3>Diagnóstico en vivo</h3>
+      <p style="font-size:.82rem;color:#a9dbe8">Movés los deslizantes y el diagnóstico del modelo cambia.</p>
+      <div class="ctrl">
+        <div class="ctrl-top"><label>Accuracy en entrenamiento</label><output id="gapTrainOut">99%</output></div>
+        <input type="range" id="gapTrain" min="40" max="100" value="99" step="1" class="violet">
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-top"><label>Accuracy en validación (CV)</label><output id="gapCvOut">82%</output></div>
+        <input type="range" id="gapCv" min="40" max="100" value="82" step="1" class="cyan">
+      </div>
+      <div class="bars" style="margin-top:.4em">
+        <div class="bar"><span class="nm">Train</span><span class="track"><i class="fill" id="gapBarTrain" style="background:linear-gradient(90deg,var(--primary),var(--violet))"></i></span><span class="val" id="gapBarTrainV">99%</span></div>
+        <div class="bar"><span class="nm">CV</span><span class="track"><i class="fill" id="gapBarCv" style="background:linear-gradient(90deg,var(--cyan),var(--primary2))"></i></span><span class="val" id="gapBarCvV">82%</span></div>
+      </div>
+      <div id="gapVerdict" class="note" style="margin-top:12px">—</div>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn sm" data-preset="99,82">Caso sobreajuste</button>
+        <button class="btn sm" data-preset="60,58">Caso subajuste</button>
+        <button class="btn sm" data-preset="88,86">Caso equilibrado</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 · DEFINICIÓN ============ -->
+<section class="slide" data-title="¿Qué es la validación cruzada?">
+  <div class="kicker"><b>02</b> Definición</div>
+  <h2>Entrenar, probar, repetir — y promediar</h2>
+  <div class="split g-3-2">
+    <div class="grid">
+      <div class="card pad-lg violet">
+        <h3>Definición formal</h3>
+        <p>La validación cruzada es un método estadístico riguroso para evaluar el desempeño de un modelo predictivo. Consiste en dividir el conjunto de datos en varios subconjuntos llamados <strong>folds</strong>.</p>
+        <ul>
+          <li>Se entrena con una parte y se evalúa con la parte restante.</li>
+          <li>Se repite <em>k</em> veces: cada subconjunto actúa <strong>exactamente una vez</strong> como conjunto de prueba.</li>
+          <li>Las métricas de todas las iteraciones se promedian → estimación <strong>insesgada</strong> del rendimiento.</li>
+        </ul>
+        <div class="note">Cada observación participa <strong>k veces como entrenamiento</strong> y <strong>1 vez como prueba</strong>. De ahí la cobertura completa del dataset.</div>
+      </div>
+      <div class="grid g3">
+        <div class="kpi cyan"><div class="v">100%</div><div class="l">Datos utilizados</div></div>
+        <div class="kpi violet"><div class="v">k</div><div class="l">Entrenamientos</div></div>
+        <div class="kpi amber"><div class="v">1/k</div><div class="l">Veces que cada obs. es test</div></div>
+      </div>
+    </div>
+    <div class="card pad-lg">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0">El ciclo, en movimiento</h3>
+        <span class="badge b-cyan" id="loopStep">Iteración 1 de 5</span>
+      </div>
+      <div class="foldwrap" id="loopFolds" style="margin-top:12px"></div>
+      <div class="legend" style="margin-top:12px">
+        <span><i style="background:var(--cyan)"></i>fold de prueba</span>
+        <span><i style="background:rgba(167,139,250,.55)"></i>fold de entrenamiento</span>
+        <span><i style="background:rgba(255,255,255,.12)"></i>sin usar en esta iteración</span>
+      </div>
+      <div class="btnrow" style="margin-top:12px;justify-content:center">
+        <button class="btn sm" id="loopPrev">◀ anterior</button>
+        <button class="btn sm pri" id="loopToggle">Pausar</button>
+        <button class="btn sm" id="loopNext">siguiente ▶</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 · LAB K-FOLD ============ -->
+<section class="slide" data-title="Laboratorio K-Fold interactivo">
+  <div class="kicker"><b>03</b> Funcionamiento algorítmico</div>
+  <h2>Laboratorio K-Fold</h2>
+  <div class="split g-1-2">
+    <div class="grid">
+      <div class="card pad-lg">
+        <h3>Controles</h3>
+        <div class="ctrl">
+          <div class="ctrl-top"><label>Número de folds (k)</label><output id="labKOut">5</output></div>
+          <input type="range" id="labK" min="2" max="10" value="5" step="1">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><label>Tamaño del dataset (N)</label><output id="labNOut">1000 obs.</output></div>
+          <input type="range" id="labN" min="40" max="1200" value="1000" step="20">
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:.5em 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:.3em 0 .7em">
+          <label class="switch"><input type="checkbox" id="labStrat"><span class="track"></span><span class="lbl">Stratified K-Fold</span></label>
+        </div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="btn sm" id="labPrev">◀ iteración</button>
+          <button class="btn sm pri" id="labPlay">▶ auto</button>
+          <button class="btn sm" id="labNext">iteración ▶</button>
+        </div>
+        <div class="note" style="margin-top:12px;font-size:.78rem"><strong>Probá:</strong> dejá el estratificado apagado y compará la proporción de positivos entre folds. Después activalo y fijate cómo se nivela.</div>
+      </div>
+      <div class="grid g2">
+        <div class="kpi cyan"><div class="v" id="labTrainPct">80%</div><div class="l">Datos de entrenamiento</div></div>
+        <div class="kpi violet"><div class="v" id="labTestN">200</div><div class="l">Obs. en el fold de prueba</div></div>
+        <div class="kpi amber"><div class="v" id="labEvals">5</div><div class="l">Evaluaciones (costo ∝ k)</div></div>
+        <div class="kpi blue"><div class="v" id="labCover">100%</div><div class="l">Cobertura de prueba</div></div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card pad-lg">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0">Particionado <span id="labIterLbl" style="color:var(--cyan)"></span></h3>
+          <div class="legend">
+            <span><i style="background:var(--cyan)"></i>Clase A (aprueba)</span>
+            <span><i style="background:rgba(167,139,250,.6)"></i>Clase B</span>
+          </div>
+        </div>
+        <div class="foldwrap" id="labFolds"></div>
+        <div id="labWarn" class="note" style="margin-top:12px"></div>
+      </div>
+      <div class="card pad-lg">
+        <h3>Las iteraciones sobre N = <span id="labNInline">1000</span></h3>
+        <table id="labTable">
+          <thead><tr><th>Iteración</th><th class="mono">Folds de entrenamiento</th><th class="mono">Fold de prueba</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="note cyan" style="margin-top:10px;font-size:.8rem">
+          <strong>Métrica global:</strong> <code>Accuracy_promedio = (1/k) · Σ Accuracy_i</code> — estimación insesgada del rendimiento sobre datos no observados.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · EJEMPLO ============ -->
+<section class="slide" data-title="Ejemplo: 100 estudiantes">
+  <div class="kicker"><b>04</b> Ejemplo aplicado</div>
+  <h2>¿Aprobará? 100 estudiantes, 5 folds</h2>
+  <div class="split g-2-1">
+    <div class="grid">
+      <div class="card pad-lg cyan">
+        <h3>El planteo</h3>
+        <p>Una universidad quiere predecir si un estudiante aprobará un examen usando <strong>horas de estudio, asistencia y cantidad de trabajos entregados</strong>. Cuenta con 100 estudiantes y utiliza una validación cruzada de 5 partes.</p>
+        <ol style="font-size:.85rem;color:#c8cee9;line-height:1.6">
+          <li>Divide los 100 estudiantes en <strong>5 grupos de 20</strong>.</li>
+          <li>Entrena el modelo con 80 estudiantes y lo evalúa con los 20 restantes.</li>
+          <li>Repite el proceso 5 veces, haciendo que cada grupo sea usado <strong>una vez</strong> como conjunto de evaluación.</li>
+          <li>Obtiene los resultados: 88%, 92%, 90%, 91% y 89%.</li>
+          <li>El promedio es de <strong>90% de precisión</strong>.</li>
+        </ol>
+        <div class="note cyan" style="margin-top:10px"><strong>¿Qué nos permite saber?</strong> Que el modelo funciona correctamente con distintos grupos de estudiantes, reduciendo el riesgo de que el resultado dependa únicamente de un grupo específico de datos.</div>
+      </div>
+      <div class="card pad-lg">
+        <h3>Cargá tus propios accuracies por fold</h3>
+        <div class="grid g2" id="exSliders"></div>
+        <div class="grid g3" style="margin-top:12px">
+          <div class="kpi cyan"><div class="v" id="exMean">90.0%</div><div class="l">Accuracy promedio</div></div>
+          <div class="kpi violet"><div class="v" id="exStd">±1.7%</div><div class="l">Desvío estándar</div></div>
+          <div class="kpi amber"><div class="v" id="exRange">88–92</div><div class="l">Rango entre folds</div></div>
+        </div>
+        <div id="exVerdict" class="note" style="margin-top:12px">—</div>
+      </div>
+    </div>
+    <div class="card pad-lg">
+      <h3>Cobertura de las 100 obs.</h3>
+      <div class="foldwrap" id="exFolds"></div>
+      <div class="legend" style="margin-top:12px"><span><i style="background:var(--cyan)"></i>las 20 obs. del fold evaluado en esta iteración</span></div>
+      <div class="grid g2" style="margin-top:12px">
+        <div class="kpi"><div class="v">80</div><div class="l">Entrenamiento por iteración</div></div>
+        <div class="kpi"><div class="v">100</div><div class="l">Evaluadas exactamente 1 vez</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 · ESTABILIDAD ============ -->
+<section class="slide" data-title="Estabilidad entre folds">
+  <div class="kicker"><b>05</b> Detección y consistencia</div>
+  <h2>No alcanza con la media: mirá la dispersión</h2>
+  <div class="split g-2-1">
+    <div class="grid">
+      <div class="card pad-lg">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 style="margin:0">Comparador de modelos</h3>
+          <div class="btnrow">
+            <button class="btn sm" id="stReset">Valores del documento</button>
+            <button class="btn sm" id="stEqualize">Igualar a 90%</button>
+          </div>
+        </div>
+        <div class="legend" style="margin-top:10px">
+          <span><i style="background:linear-gradient(90deg,var(--cyan),var(--cyan))"></i>línea discontinua = media del modelo</span>
+          <span>cada barra = accuracy de un fold (F1…F5)</span>
+        </div>
+        <div class="grid g2" style="margin-top:10px">
+          <div>
+            <div class="badge b-cyan" style="margin-bottom:.5em">Modelo A · consistente</div>
+            <div id="stSlidersA"></div>
+            <div id="stChartA" style="margin-top:.5em"></div>
+          </div>
+          <div>
+            <div class="badge b-rose" style="margin-bottom:.5em">Modelo B · inestable</div>
+            <div id="stSlidersB"></div>
+            <div id="stChartB" style="margin-top:.5em"></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card pad-lg cyan">
+          <h3>Reglas de diagnóstico</h3>
+          <ul style="margin:0">
+            <li><strong>Sobreajuste:</strong> brecha alta entre train y CV (≥ 8 pts).</li>
+            <li><strong>Subajuste:</strong> rendimiento bajo en <em>ambos</em>.</li>
+            <li><strong>Inestabilidad:</strong> σ alta entre folds → el modelo depende de la muestra.</li>
+            <li><strong>Comparación justa:</strong> misma partición para todos los algoritmos.</li>
+          </ul>
+        </div>
+        <div class="card pad-lg amber">
+          <h3>Cómo se reporta</h3>
+          <p style="margin:0">Siempre <strong>media ± σ</strong> sobre los <em>k</em> folds. Un 90% con σ ±0,7 es confiable; un 82% con σ ±12 es una lotería.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card pad-lg">
+      <h3>Resultado</h3>
+      <div class="grid g2" style="margin-bottom:10px">
+        <div class="kpi cyan"><div class="v" id="stMeanA">90.2%</div><div class="l">Media A · σ <span id="stSdA">±0.7</span></div></div>
+        <div class="kpi rose"><div class="v" id="stMeanB">82.2%</div><div class="l">Media B · σ <span id="stSdB">±12.1</span></div></div>
+      </div>
+      <div id="stVerdictA" class="note cyan">—</div>
+      <div id="stVerdictB" class="note rose" style="margin-top:8px">—</div>
+      <div class="note" style="margin-top:10px;font-size:.8rem"><strong>Consecuencia práctica:</strong> el Modelo A es el que llega a producción; el B puede fallar en un fold concreto.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 · ESTRATEGIAS ============ -->
+<section class="slide" data-title="Tipos y estrategias">
+  <div class="kicker"><b>06</b> Estrategias</div>
+  <h2>Siete formas de particionar</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+    <p class="lead" style="max-width:760px;margin:0">Cada técnica parte el dataset de otra manera. Tocá una tarjeta para ver el detalle.</p>
+    <div class="legend">
+      <span><i style="background:var(--cyan)"></i>fold de prueba (test)</span>
+      <span><i style="background:var(--violet);opacity:.5"></i>fold de entrenamiento</span>
+      <span><i style="background:var(--violet);opacity:.15"></i>no usado en esa iteración</span>
+    </div>
+  </div>
+  <div class="strat" id="stratGrid"></div>
+  <div class="card pad-lg" id="stratDetail" style="margin-top:14px"></div>
+</section>
+
+<!-- ============ 8 · MÉTRICAS ============ -->
+<section class="slide" data-title="Laboratorio de métricas">
+  <div class="kicker"><b>07</b> Métricas de evaluación</div>
+  <h2>Laboratorio de métricas</h2>
+  <div class="split g-2-1">
+    <div class="grid">
+      <div class="card pad-lg">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.6em">
+          <h3 style="margin:0">Matriz de confusión (un fold)</h3>
+          <div class="btnrow">
+            <button class="btn sm" data-cpreset="88,10,12,140">Balanceado</button>
+            <button class="btn sm" data-cpreset="45,60,55,40">Desbalanceado</button>
+            <button class="btn sm" data-cpreset="90,2,45,63">Alto recall</button>
+          </div>
+        </div>
+        <div class="grid g2" style="gap:16px">
+          <div>
+            <div class="ctrl"><div class="ctrl-top"><label>Verdaderos Positivos (VP)</label><output id="tpOut">88</output></div><input type="range" id="tp" min="0" max="200" value="88" step="1" class="cyan"></div>
+            <div class="ctrl"><div class="ctrl-top"><label>Falsos Positivos (FP)</label><output id="fpOut">10</output></div><input type="range" id="fp" min="0" max="200" value="10" step="1" class="rose"></div>
+          </div>
+          <div>
+            <div class="ctrl"><div class="ctrl-top"><label>Falsos Negativos (FN)</label><output id="fnOut">12</output></div><input type="range" id="fn" min="0" max="200" value="12" step="1" class="amber"></div>
+            <div class="ctrl"><div class="ctrl-top"><label>Verdaderos Negativos (VN)</label><output id="tnOut">140</output></div><input type="range" id="tn" min="0" max="400" value="140" step="1" class="violet"></div>
+          </div>
+        </div>
+        <div class="cm" id="cmGrid" style="margin-top:14px"></div>
+      </div>
+      <div class="card pad-lg cyan">
+        <h3>Métricas calculadas en vivo</h3>
+        <div class="bars" id="metricBars"></div>
+        <div id="metricNote" class="note" style="margin-top:12px">—</div>
+      </div>
+    </div>
+    <div class="card pad-lg">
+      <h3>Fórmulas</h3>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:.45em 0;border-bottom:1px solid var(--line)"><code>Accuracy = (VP+VN)/Total</code><br><small>Proporción de aciertos globales.</small></li>
+        <li style="padding:.45em 0;border-bottom:1px solid var(--line)"><code>Precision = VP / (VP+FP)</code><br><small>Calidad del positivo: de lo que predije positivo, ¿cuánto lo era?</small></li>
+        <li style="padding:.45em 0;border-bottom:1px solid var(--line)"><code>Recall = VP / (VP+FN)</code><br><small>Cobertura: de todos los positivos reales, ¿a cuántos encontré?</small></li>
+        <li style="padding:.45em 0;border-bottom:1px solid var(--line)"><code>F1 = 2·(P·R)/(P+R)</code><br><small>Media armónica: penaliza el desequilibrio.</small></li>
+        <li style="padding:.45em 0"><code>ROC-AUC</code><br><small>Discriminación global frente a cambios de umbral.</small></li>
+      </ul>
+      <div class="note amber" style="margin-top:10px;font-size:.79rem"><strong>Elegí según el costo del error:</strong> en fraude o diagnóstico médico priorizá <em>Recall</em>; en recomendaciones priorizá <em>Precision</em>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9 · SESGO-VARIANZA ============ -->
+<section class="slide" data-title="Compromiso sesgo-varianza">
+  <div class="kicker"><b>08</b> Fundamentos avanzados</div>
+  <h2>El compromiso sesgo–varianza</h2>
+  <div class="split g-3-2">
+    <div class="card pad-lg">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+        <h3 style="margin:0">Efecto de <em>k</em> sobre la estimación del error</h3>
+        <div style="min-width:230px;flex:1;max-width:340px">
+          <div class="ctrl" style="margin:0">
+            <div class="ctrl-top"><label>Número de folds (k)</label><output id="bvKOut">5</output></div>
+            <input type="range" id="bvK" min="2" max="20" value="5" step="1" class="cyan">
+          </div>
+        </div>
+      </div>
+      <svg id="bvChart" viewBox="0 0 720 320" style="width:100%;height:auto;margin-top:10px" role="img" aria-label="Curvas de sesgo y varianza según el número de folds"></svg>
+      <div class="legend" style="margin-top:6px;justify-content:center">
+        <span><i style="background:var(--rose)"></i>sesgo pesimista</span>
+        <span><i style="background:var(--amber)"></i>varianza</span>
+        <span><i style="background:var(--cyan)"></i>error total estimado</span>
+        <span><i style="background:rgba(124,92,255,.5)"></i>zona recomendada (5–10)</span>
+      </div>
+      <div class="foot">Curvas ilustrativas del compromiso sesgo–varianza descrito por Hastie et al. (2009) y Kohavi (1995).</div>
+    </div>
+    <div class="grid">
+      <div class="grid g2">
+        <div class="kpi cyan"><div class="v" id="bvTrain">80%</div><div class="l">Datos de entrenamiento</div></div>
+        <div class="kpi violet"><div class="v" id="bvEvals">5</div><div class="l">Entrenamientos</div></div>
+      </div>
+      <div class="card pad-lg" id="bvVerdict" style="border-color:rgba(34,211,238,.45)">
+        <h3>Diagnóstico</h3>
+        <p style="margin:0" id="bvText">—</p>
+      </div>
+      <div class="card pad-lg">
+        <h3>Los tres regímenes</h3>
+        <ul style="margin:0">
+          <li><strong>k bajo (2–3):</strong> se entrena con 50–66% de los datos → <em>sobrestima</em> el error (sesgo pesimista), pero la varianza es baja.</li>
+          <li><strong>k medio (5–10):</strong> punto óptimo empírico recomendado.</li>
+          <li><strong>k = N (LOOCV):</strong> prácticamente insesgado, pero con varianza altísima: los N modelos comparten (N−2)/(N−1) de las observaciones → alta correlación entre estimaciones.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10 · DATA LEAKAGE ============ -->
+<section class="slide" data-title="Data Leakage y pipelines">
+  <div class="kicker"><b>09</b> El error que arruina proyectos</div>
+  <h2>Data Leakage: no mires el conjunto de prueba</h2>
+  <div class="split g-2-1">
+    <div class="grid">
+      <div class="card pad-lg rose">
+        <h3><span style="color:var(--rose)">✕</span> Práctica incorrecta</h3>
+        <p style="font-size:.83rem">El <code>StandardScaler</code> aprende la media y la varianza de <strong>todo</strong> el dataset, incluidos los folds de prueba. Las métricas quedan <em>artificialmente optimistas</em> y fracasan en producción.</p>
+        <div class="code"><div class="code-head"><span class="fn">data_leakage.py</span><span class="badge b-rose">fuga de información</span></div><pre><code id="cBad"></code></pre></div>
+      </div>
+      <div class="card pad-lg cyan">
+        <h3><span style="color:var(--cyan)">✓</span> Práctica correcta: Pipeline</h3>
+        <p style="font-size:.83rem">El preprocesamiento se encapsula: el <code>fit</code> ocurre <strong>solo dentro de cada fold de entrenamiento</strong>. Cada fold se escala por separado.</p>
+        <div class="code"><div class="code-head"><span class="fn">pipeline_correcto.py</span><span class="badge b-cyan">correcto</span></div><pre><code id="cGood"></code></pre></div>
+      </div>
+    </div>
+    <div class="card pad-lg">
+      <h3>Visualización del error</h3>
+      <div id="leakViz"></div>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn sm pri" id="leakToggle">Ver práctica correcta</button>
+      </div>
+      <div class="grid g2" style="margin-top:12px">
+        <div class="kpi rose"><div class="v">96%</div><div class="l">Con leakage (optimista)</div></div>
+        <div class="kpi cyan"><div class="v">89%</div><div class="l">Real en producción</div></div>
+      </div>
+      <div class="note amber" style="margin-top:10px;font-size:.79rem"><strong>Chequeo rápido:</strong> si el score con CV es <em>demasiado</em> bueno, sospechá de una fuga.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 · NESTED CV ============ -->
+<section class="slide" data-title="Validación anidada">
+  <div class="kicker"><b>10</b> Cuando también optimizás hiperparámetros</div>
+  <h2>Validación anidada (Nested CV)</h2>
+  <div class="split g-2-1">
+    <div class="card pad-lg">
+      <h3>El sesgo de selección optimista</h3>
+      <p>Si usás validación cruzada para <strong>elegir</strong> hiperparámetros (GridSearchCV) y además reportás el mejor puntaje obtenido como rendimiento esperado, introducís un <em>sesgo de selección optimista</em>: el mejor score de una búsqueda siempre gana en parte por azar.</p>
+      <div class="grid g2" style="margin-top:8px">
+        <div class="note rose"><strong>Sin anidar:</strong> 94% reportado → demasiado optimista.</div>
+        <div class="note cyan"><strong>Con Nested CV:</strong> 88% insesgado → el número que podés defender.</div>
+      </div>
+      <div class="grid g2" style="margin-top:10px">
+        <div class="note"><strong style="color:var(--cyan)">Bucle interno:</strong> afina los hiperparámetros sobre los subfolds de entrenamiento.</div>
+        <div class="note amber"><strong>Bucle externo:</strong> evalúa el modelo ya optimizado sobre datos que nunca participaron de la elección de parámetros.</div>
+      </div>
+      <div class="code" style="margin-top:12px"><div class="code-head"><span class="fn">nested_cv.py</span><button class="btn sm" data-copy="cNested">Copiar</button></div><pre><code id="cNested"></code></pre></div>
+    </div>
+    <div class="card pad-lg">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0">Los dos bucles</h3>
+        <span class="badge b-cyan" id="nestMode">Nested CV</span>
+      </div>
+      <svg id="nestChart" viewBox="0 0 360 300" style="width:100%;height:auto;margin-top:8px" role="img" aria-label="Diagrama de validación anidada"></svg>
+      <div class="btnrow" style="justify-content:center;margin-top:6px">
+        <button class="btn sm" id="nestToggle">Ver sin anidar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12 · SCIKIT-LEARN ============ -->
+<section class="slide" data-title="Implementación en Scikit-Learn">
+  <div class="kicker"><b>11</b> Implementación técnica</div>
+  <h2>Scikit-Learn en la práctica</h2>
+  <div class="tabs" id="skTabs">
+    <button class="btn sm pri" data-tab="t1">cross_val_score()</button>
+    <button class="btn sm" data-tab="t2">cross_validate()</button>
+    <button class="btn sm" data-tab="t3">cross_val_predict()</button>
+    <button class="btn sm" data-tab="t4">Splitters</button>
+    <button class="btn sm" data-tab="t5">Pipeline + GridSearch</button>
+  </div>
+  <div class="split g-3-2">
+    <div class="code" style="min-height:min(44vh,330px)"><div class="code-head"><span class="fn" id="skName">cross_val_score</span><button class="btn sm" id="skCopy">Copiar código</button></div><pre><code id="skCode"></code></pre></div>
+    <div class="card pad-lg" id="skInfo"></div>
+  </div>
+</section>
+
+<!-- ============ 13 · VENTAJAS / LÍMITES ============ -->
+<section class="slide" data-title="Ventajas y limitaciones">
+  <div class="kicker"><b>12</b> Balance comparativo</div>
+  <h2>Ventajas y limitaciones</h2>
+  <div class="grid g2">
+    <div class="card pad-lg cyan">
+      <h3><span class="dot" style="background:var(--cyan)"></span>Ventajas principales</h3>
+      <ul style="margin:0">
+        <li>Estimación <strong>insesgada y altamente confiable</strong> del rendimiento en generalización.</li>
+        <li>Elimina la dependencia del <strong>sesgo de una partición aleatoria única</strong>.</li>
+        <li>Aprovecha eficientemente todo el volumen muestral disponible.</li>
+        <li>Plataforma <strong>equitativa</strong> para contrastar arquitecturas (Árboles, Random Forest, SVM, Regresión Logística).</li>
+        <li>Detección temprana y precisa de sobreajuste y subajuste.</li>
+        <li>Estándar riguroso para la búsqueda de hiperparámetros.</li>
+      </ul>
+    </div>
+    <div class="card pad-lg rose">
+      <h3><span class="dot" style="background:var(--rose)"></span>Limitaciones</h3>
+      <ul style="margin:0">
+        <li>Costo computacional <strong>multiplicado por k</strong>.</li>
+        <li>Inadecuada en su variante tradicional para <strong>series temporales</strong> (exige TimeSeriesSplit).</li>
+        <li>Innecesaria en Big Data extremo: un Hold-Out con millones de filas basta.</li>
+        <li><strong>Riesgo de fuga de información</strong> si el preprocesamiento no se encapsula por fold.</li>
+        <li>Con clases muy desbalanceadas, la versión estándar puede sesgar las minorías.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pad-lg" style="margin-top:14px">
+    <h3>Checklist antes de presentar un modelo</h3>
+    <div class="grid g4" id="checklist"></div>
+  </div>
+</section>
+
+<!-- ============ 13 · GLOSARIO Y REFERENCIAS ============ -->
+<section class="slide" data-title="Glosario y referencias">
+  <div class="kicker"><b>13</b> Cierre</div>
+  <h2>Glosario y referencias</h2>
+  <div class="split g-3-2">
+    <div class="grid">
+      <input class="search" id="gSearch" type="search" placeholder="Buscar término… (ej. leakage, fold, pipeline)">
+      <div class="gloss" id="glossBox"></div>
+    </div>
+    <div class="card pad-lg">
+      <h3>Referencias (APA 7)</h3>
+      <ol style="padding-left:1.15em;margin:0;font-size:.78rem;color:#b9c0e0;line-height:1.55">
+        <li>Bishop, C. M. (2006). <em>Pattern Recognition and Machine Learning</em>. Springer.</li>
+        <li>Breiman, L., &amp; Spector, P. (1992). Submodel selection and evaluation in regression: The X-random case. <em>International Statistical Review</em>, 60(3), 291-319.</li>
+        <li>Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). <em>The Elements of Statistical Learning</em> (2nd ed.). Springer.</li>
+        <li>James, G., Witten, D., Hastie, T., &amp; Tibshirani, R. (2021). <em>An Introduction to Statistical Learning</em> (2nd ed.). Springer.</li>
+        <li>Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. <em>IJCAI</em>, 14(2), 1137-1145.</li>
+        <li>Mitchell, T. M. (1997). <em>Machine Learning</em>. McGraw-Hill.</li>
+        <li>Rao, R. B., Fung, G., &amp; Rosales, R. (2008). On the dangers of cross-validation: An experimental evaluation. <em>SIAM SDM</em>, 588-596.</li>
+        <li>Scikit-Learn Developers. (s.f.). <em>Cross-validation: evaluating estimator performance</em>. Scikit-learn Documentation.</li>
+      </ol>
+      <div class="note cyan" style="margin-top:12px">¿Preguntas? Los laboratorios de esta presentación permiten <strong>reproducir cada resultado en vivo</strong>.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="hud">
+  <button class="iconbtn" id="btnPrev" title="Anterior (←)">‹</button>
+  <span class="cnt"><b id="cntNow">1</b> / <span id="cntAll">15</span></span>
+  <button class="iconbtn" id="btnNext" title="Siguiente (→)">›</button>
+  <button class="iconbtn" id="btnIdx" title="Índice (O)">☰</button>
+  <button class="iconbtn" id="btnHelp" title="Ayuda (?)">?</button>
+  <button class="iconbtn" id="btnFull" title="Pantalla completa (F)">⛶</button>
+</nav>
+
+<div class="overlay" id="idxOverlay">
+  <h3>Índice de secciones</h3>
+  <div class="idx-list" id="idxList"></div>
+</div>
+
+<div class="overlay" id="helpOverlay">
+  <h3>Atajos de teclado</h3>
+  <div class="keys">
+    <div class="keyrow"><span>Avanzar / retroceder</span><span><kbd>→</kbd> <kbd>←</kbd> <kbd>Espacio</kbd></span></div>
+    <div class="keyrow"><span>Primera / última sección</span><span><kbd>Inicio</kbd> <kbd>Fin</kbd></span></div>
+    <div class="keyrow"><span>Índice de secciones</span><span><kbd>O</kbd></span></div>
+    <div class="keyrow"><span>Pantalla completa</span><span><kbd>F</kbd></span></div>
+    <div class="keyrow"><span>Ir a la sección N</span><span><kbd>1</kbd> … <kbd>9</kbd></span></div>
+    <div class="keyrow"><span>Cerrar overlay</span><span><kbd>Esc</kbd></span></div>
+    <div class="keyrow"><span>En móvil</span><span>deslizá el dedo ← →</span></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
