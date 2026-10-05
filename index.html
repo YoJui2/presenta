@@ -132,7 +132,16 @@
     .observation-cell { margin-top: 1rem; padding: 1rem 1.2rem; }
     .observation-cell h3 { margin-bottom: .5rem; }
     .observation-cell p { margin: 0; }
-    .leakage-demo { width: min(100%, 1100px); }
+    .leakage-slide {
+      height: 100vh; min-height: 0; justify-content: flex-start;
+      overflow-y: auto; padding: clamp(1rem, 3vh, 2.5rem) clamp(1rem, 4vw, 4rem) 6rem;
+    }
+    .leakage-slide > h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); }
+    .leakage-layout {
+      display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(17rem, 1fr);
+      align-items: start; gap: 1.2rem; width: 100%; max-width: 1500px; min-width: 0;
+    }
+    .leakage-demo { max-width: none; min-width: 0; }
     .leakage-demo pre { max-width: none; min-height: 12rem; }
     .leakage-demo .interactive-controls { margin-bottom: 1rem; }
     .leakage-demo .leakage-select.active { border-color: var(--cyan); }
@@ -143,6 +152,13 @@
     .leakage-demo .leakage-select.active:hover, .leakage-demo .leakage-select.active:focus-visible {
       background: var(--navy); color: var(--ink);
     }
+    .leakage-demo pre { margin: .8rem 0; min-height: 4rem; }
+    .leakage-demo pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .leakage-demo .leakage-output { min-height: 5rem; }
+    .leakage-demo .leakage-output code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .leakage-theory { grid-template-columns: 1fr; gap: .8rem; width: 100%; }
+    .leakage-theory .card { padding: 1rem 1.2rem; }
+    .leakage-theory .card p { margin-bottom: 0; }
     .slide.editor-expanded-slide {
       height: 100vh; min-height: 0; justify-content: flex-start;
       overflow-y: auto; padding-bottom: 6rem;
@@ -184,9 +200,11 @@
       body { overflow: auto; }
       .slide { min-height: 100svh; padding-bottom: 5rem; }
       .technical-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
+      .leakage-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
       .grid, .grid.three { grid-template-columns: 1fr; }
       .technical-layout { grid-template-columns: 1fr; }
       .technical-info { grid-template-columns: 1fr; }
+      .leakage-layout { grid-template-columns: 1fr; }
       .technical-demo textarea { min-height: 40vh !important; max-height: 60vh; font-size: 1rem !important; }
       .technical-layout.editor-expanded .technical-demo textarea { min-height: 55vh !important; }
       .slide.editor-expanded-slide { height: auto; min-height: 100svh; overflow: visible; }
@@ -424,23 +442,38 @@ print("Desviación estándar:", scores.std())</textarea>
       </div>
     </section>
 
-    <section class="slide compact" aria-label="Data leakage">
-      <span class="eyebrow">9.2 · Buenas prácticas</span>
+    <section class="slide compact leakage-slide" aria-label="Data leakage">
+      <span class="eyebrow">9.1 · Buenas prácticas</span>
       <h2>Data leakage: cuando el futuro se filtra al entrenamiento</h2>
-      <div class="interactive leakage-demo">
-        <div class="interactive-controls" role="group" aria-label="Elegir práctica de validación">
-          <button class="leakage-select active" type="button" data-example="incorrect" aria-pressed="true">✕ Práctica incorrecta</button>
-          <button class="leakage-select" type="button" data-example="correct" aria-pressed="false">✓ Práctica correcta</button>
+      <div class="leakage-layout">
+        <div class="interactive leakage-demo">
+          <div class="interactive-controls" role="group" aria-label="Elegir práctica de validación">
+            <button class="leakage-select active" type="button" data-example="incorrect" aria-pressed="true">✕ Práctica incorrecta</button>
+            <button class="leakage-select" type="button" data-example="correct" aria-pressed="false">✓ Práctica correcta</button>
+          </div>
+          <h3 id="leakage-code-title" class="accent">Código · Práctica incorrecta</h3>
+          <pre><code id="leakage-code" aria-live="polite"></code></pre>
+          <div class="interactive-controls">
+            <button id="run-leakage" type="button">Ejecutar demostración</button>
+            <span id="leakage-status" class="small" role="status"></span>
+          </div>
+          <pre class="leakage-output"><code id="leakage-output">La salida aparecerá aquí...</code></pre>
         </div>
-        <h3 id="leakage-title" class="accent">✕ Práctica incorrecta · Data leakage</h3>
-        <p id="leakage-description" class="small" aria-live="polite">El scaler aprende la media y la escala usando todo X, incluido el fold de test, antes de la validación. Esto filtra información y hace que la métrica sea demasiado optimista.</p>
-        <pre><code id="leakage-code" aria-live="polite"></code></pre>
+        <div class="grid leakage-theory">
+          <article class="card bad">
+            <h3><strong>✕ Práctica incorrecta · Data leakage</strong></h3>
+            <p>Si el escalador se ajusta con todo X antes de validar, también aprende de los datos que luego serán test. Esa información se filtra al entrenamiento y puede sesgar la evaluación.</p>
+          </article>
+          <article class="card good">
+            <h3><strong>✓ Práctica correcta · Pipeline</strong></h3>
+            <p>Al incluir el escalador en un Pipeline, se ajusta sólo con los datos de entrenamiento de cada fold. El fold de test se transforma sin participar en el aprendizaje.</p>
+          </article>
+        </div>
       </div>
-
     </section>
 
     <section class="slide" aria-label="Sesgo y varianza">
-      <span class="eyebrow">9.1 · Compromiso sesgo–varianza</span>
+      <span class="eyebrow">9.2 · Compromiso sesgo–varianza</span>
       <h2>El compromiso <span class="magenta">sesgo–varianza</span></h2>
       <div class="grid three">
         <article class="card"><h3>k bajo</h3><p>Menos datos para entrenar por vuelta.</p><p class="magenta">Mayor sesgo · menor costo</p></article>
@@ -606,10 +639,9 @@ print("Desviación estándar:", scores.std())</textarea>
       // Python runner (Pyodide) global
       let pyodideReady = false;
       let pyodideInstance = null;
-      async function ensurePyodide() {
+      async function ensurePyodide(statusElement = document.getElementById("py-status")) {
         if (pyodideReady && pyodideInstance) return pyodideInstance;
-        const pyStatusEl = document.getElementById("py-status");
-        if (pyStatusEl) pyStatusEl.textContent = "Cargando Python (Pyodide)...";
+        if (statusElement) statusElement.textContent = "Cargando Python (Pyodide)...";
         const script = document.createElement("script");
         script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
         document.body.appendChild(script);
@@ -617,7 +649,7 @@ print("Desviación estándar:", scores.std())</textarea>
         pyodideInstance = await window.loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
         await pyodideInstance.loadPackage(["scikit-learn", "numpy", "pandas"]);
         pyodideReady = true;
-        if (pyStatusEl) pyStatusEl.textContent = "Listo para ejecutar";
+        if (statusElement) statusElement.textContent = "Listo para ejecutar";
         return pyodideInstance;
       }
 
@@ -755,37 +787,58 @@ print(matriz)`
 
       const leakageExamples = {
         incorrect: {
-          title: "✕ Práctica incorrecta · Data leakage",
-          description: "El scaler aprende la media y la escala usando todo X, incluido el fold de test, antes de la validación. Esto filtra información y hace que la métrica sea demasiado optimista.",
-          code: `from sklearn.preprocessing import StandardScaler
+          title: "Código · Práctica incorrecta",
+          code: `from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
 
-# Incorrecto: el scaler ve también los datos de test
+X, y = make_classification(n_samples=200, n_features=6, n_informative=4, random_state=42)
+model = LogisticRegression(max_iter=1000)
+
+# Incorrecto: el scaler ve todos los datos antes de crear los folds
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
-scores = cross_val_score(model, X_scaled, y, cv=5)`
+scores = cross_val_score(model, X_scaled, y, cv=5, scoring="accuracy")
+
+print("Accuracy por fold:", scores)
+print("Accuracy promedio:", scores.mean())
+print("Observaciones usadas para ajustar el scaler:", scaler.n_samples_seen_)
+print("Se incluyeron también las observaciones de test.")`
         },
         correct: {
-          title: "✓ Práctica correcta · Uso de Pipeline",
-          description: "El Pipeline ajusta el scaler dentro de cada fold: sólo aprende de los datos de entrenamiento y después transforma el fold de test.",
-          code: `from sklearn.preprocessing import StandardScaler
+          title: "Código · Práctica correcta · Pipeline",
+          code: `from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_validate
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
 
-# Correcto: el scaler se ajusta sólo en train
+X, y = make_classification(n_samples=200, n_features=6, n_informative=4, random_state=42)
+model = LogisticRegression(max_iter=1000)
+
+# Correcto: el scaler se ajusta sólo con el train de cada fold
 pipe = make_pipeline(StandardScaler(), model)
-scores = cross_val_score(pipe, X, y, cv=5)`
+cv_results = cross_validate(pipe, X, y, cv=5, scoring="accuracy", return_estimator=True)
+scores = cv_results["test_score"]
+scaler = cv_results["estimator"][0].named_steps["standardscaler"]
+
+print("Accuracy por fold:", scores)
+print("Accuracy promedio:", scores.mean())
+print("Observaciones usadas por el scaler en el primer fold:", scaler.n_samples_seen_)
+print("De 200 registros, 160 son train y 40 quedan para test.")`
         }
       };
-      const leakageTitle = document.getElementById("leakage-title");
-      const leakageDescription = document.getElementById("leakage-description");
+      const leakageCodeTitle = document.getElementById("leakage-code-title");
       const leakageCode = document.getElementById("leakage-code");
+      const runLeakage = document.getElementById("run-leakage");
+      const leakageOutput = document.getElementById("leakage-output");
+      const leakageStatus = document.getElementById("leakage-status");
       const leakageButtons = document.querySelectorAll(".leakage-select");
       function selectLeakageExample(key) {
         const example = leakageExamples[key];
         if (!example) return;
-        if (leakageTitle) leakageTitle.textContent = example.title;
-        if (leakageDescription) leakageDescription.textContent = example.description;
+        if (leakageCodeTitle) leakageCodeTitle.textContent = example.title;
         if (leakageCode) leakageCode.textContent = example.code;
         leakageButtons.forEach(button => {
           const isActive = button.dataset.example === key;
@@ -796,6 +849,31 @@ scores = cross_val_score(pipe, X, y, cv=5)`
       selectLeakageExample("incorrect");
       leakageButtons.forEach(button => {
         button.addEventListener("click", () => selectLeakageExample(button.dataset.example));
+      });
+      runLeakage?.addEventListener("click", async () => {
+        if (!leakageCode || !leakageOutput) return;
+        runLeakage.disabled = true;
+        if (leakageStatus) leakageStatus.textContent = "Ejecutando...";
+        leakageOutput.textContent = "";
+        try {
+          const py = await ensurePyodide(leakageStatus);
+          await py.runPythonAsync(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+`);
+          await py.runPythonAsync(leakageCode.textContent);
+          const stdout = await py.runPythonAsync("sys.stdout.getvalue()");
+          const stderr = await py.runPythonAsync("sys.stderr.getvalue()");
+          leakageOutput.textContent = (stdout || "") + (stderr ? "\\n" + stderr : "") || "Sin salida";
+          if (leakageStatus) leakageStatus.textContent = "Demostración completada";
+        } catch (error) {
+          leakageOutput.textContent = error.toString();
+          if (leakageStatus) leakageStatus.textContent = "Error al ejecutar";
+        } finally {
+          runLeakage.disabled = false;
+        }
       });
 
       // Toggle code blocks on click (cleanup if present)
