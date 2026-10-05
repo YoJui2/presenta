@@ -73,6 +73,29 @@
     .balance-slide { align-items: center; text-align: center; }
     .balance-slide > h2 { margin-inline: auto; }
     .balance-slide > .grid { width: min(100%, 1180px); text-align: left; }
+    .bias-slide { align-items: center; text-align: center; }
+    .bias-slide > h2 { margin-inline: auto; }
+    .bias-comparison-wrap { width: min(100%, 1180px); text-align: left; }
+    .bias-comparison { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+    .bias-comparison th, .bias-comparison td { padding: .9rem 1rem; border-bottom: 1px solid var(--line); }
+    .bias-comparison thead th { text-align: left; background: rgba(27, 29, 34, .95); }
+    .bias-comparison thead th:first-child { width: 19%; border-radius: .8rem 0 0 0; }
+    .bias-comparison thead th:last-child { border-radius: 0 .8rem 0 0; }
+    .bias-comparison th small { display: block; margin-top: .2rem; color: var(--muted); font-size: .9rem; font-weight: 500; }
+    .bias-comparison .k-low { color: var(--cyan); }
+    .bias-comparison .k-mid { color: var(--lime); }
+    .bias-comparison .k-high { color: var(--magenta); }
+    .bias-comparison tbody th { color: var(--muted); text-align: left; font-size: 1rem; }
+    .bias-comparison tbody td { background: rgba(16, 17, 20, .72); }
+    .bias-comparison tbody td:nth-child(3) { background: rgba(255, 90, 79, .09); }
+    .bias-comparison tbody tr:last-child th { border-radius: 0 0 0 .8rem; }
+    .bias-comparison tbody tr:last-child td:last-child { border-radius: 0 0 .8rem 0; }
+    .bias-comparison .cell-value { display: block; font-size: 1.15rem; font-weight: 800; }
+    .bias-comparison .cell-note { display: block; margin-top: .2rem; color: var(--muted); font-size: .95rem; }
+    .bias-summary {
+      margin: 1rem 0 0; padding: .8rem 1rem; border-left: 5px solid var(--lime);
+      background: rgba(27, 29, 34, .9); color: var(--ink); font-weight: 700;
+    }
     .card p, .card li { font-size: 1.25rem; }
     ul { margin: .4rem 0 0; padding-left: 1.3rem; }
     li { margin: .4rem 0; }
@@ -143,6 +166,12 @@
     }
     .leakage-demo { max-width: none; min-width: 0; }
     .leakage-demo pre { max-width: none; min-height: 12rem; }
+    .leakage-demo .leakage-code-cell {
+      max-height: clamp(14rem, 34vh, 24rem); overflow: auto;
+    }
+    .leakage-demo .leakage-code-cell code {
+      white-space: pre; overflow-wrap: normal;
+    }
     .leakage-demo .interactive-controls { margin-bottom: 1rem; }
     .leakage-demo .leakage-select.active { border-color: var(--cyan); }
     .leakage-demo .leakage-select:not(.active) { background: rgba(27, 29, 34, .9); border-color: var(--line); }
@@ -159,6 +188,7 @@
     .leakage-theory { grid-template-columns: 1fr; gap: .8rem; width: 100%; }
     .leakage-theory .card { padding: 1rem 1.2rem; }
     .leakage-theory .card p { margin-bottom: 0; }
+    .leakage-theory .leakage-observation { border-left: 5px solid var(--cyan); }
     .slide.editor-expanded-slide {
       height: 100vh; min-height: 0; justify-content: flex-start;
       overflow-y: auto; padding-bottom: 6rem;
@@ -202,9 +232,29 @@
       .technical-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
       .leakage-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
       .grid, .grid.three { grid-template-columns: 1fr; }
+      .bias-comparison, .bias-comparison tbody, .bias-comparison tr { display: block; width: 100%; }
+      .bias-comparison thead { display: none; }
+      .bias-comparison tbody { display: grid; gap: .7rem; }
+      .bias-comparison tbody tr {
+        display: grid; grid-template-columns: 1fr; padding: .8rem 1rem;
+        border: 1px solid var(--line); border-radius: .8rem;
+        background: rgba(27, 29, 34, .92);
+      }
+      .bias-comparison tbody th, .bias-comparison tbody td {
+        display: grid; grid-template-columns: minmax(6.5rem, .65fr) minmax(0, 1fr);
+        gap: .75rem; padding: .5rem 0; border: 0; border-bottom: 1px solid var(--line);
+        text-align: left; background: transparent !important;
+      }
+      .bias-comparison tbody th { display: block; padding-top: 0; color: var(--ink); font-size: 1.05rem; font-weight: 800; }
+      .bias-comparison tbody td:last-child { border-bottom: 0; }
+      .bias-comparison tbody td::before { content: attr(data-label); color: var(--muted); font-size: .9rem; font-weight: 700; }
+      .bias-comparison .cell-value { font-size: 1rem; }
+      .bias-comparison .cell-note { font-size: .85rem; }
+      .bias-summary { width: 100%; }
       .technical-layout { grid-template-columns: 1fr; }
       .technical-info { grid-template-columns: 1fr; }
       .leakage-layout { grid-template-columns: 1fr; }
+      .leakage-demo .leakage-code-cell { max-height: 45svh; }
       .technical-demo textarea { min-height: 40vh !important; max-height: 60vh; font-size: 1rem !important; }
       .technical-layout.editor-expanded .technical-demo textarea { min-height: 55vh !important; }
       .slide.editor-expanded-slide { height: auto; min-height: 100svh; overflow: visible; }
@@ -452,7 +502,7 @@ print("Desviación estándar:", scores.std())</textarea>
             <button class="leakage-select" type="button" data-example="correct" aria-pressed="false">✓ Práctica correcta</button>
           </div>
           <h3 id="leakage-code-title" class="accent">Código · Práctica incorrecta</h3>
-          <pre><code id="leakage-code" aria-live="polite"></code></pre>
+          <pre class="leakage-code-cell"><code id="leakage-code" aria-live="polite"></code></pre>
           <div class="interactive-controls">
             <button id="run-leakage" type="button">Ejecutar demostración</button>
             <span id="leakage-status" class="small" role="status"></span>
@@ -468,19 +518,56 @@ print("Desviación estándar:", scores.std())</textarea>
             <h3><strong>✓ Práctica correcta · Pipeline</strong></h3>
             <p>Al incluir el escalador en un Pipeline, se ajusta sólo con los datos de entrenamiento de cada fold. El fold de test se transforma sin participar en el aprendizaje.</p>
           </article>
+          <article class="card leakage-observation" aria-live="polite">
+            <h3 id="leakage-observation-title" class="accent">Observación del código · Práctica incorrecta</h3>
+            <p id="leakage-observation">El scaler se ajusta antes de separar los folds y usa las 200 observaciones, incluidas las de test. Aunque la métrica coincida con la práctica correcta, la evaluación queda contaminada.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="slide" aria-label="Sesgo y varianza">
+    <section class="slide bias-slide" aria-label="Sesgo y varianza">
       <span class="eyebrow">9.2 · Compromiso sesgo–varianza</span>
       <h2>El compromiso <span class="magenta">sesgo–varianza</span></h2>
-      <div class="grid three">
-        <article class="card"><h3>k bajo</h3><p>Menos datos para entrenar por vuelta.</p><p class="magenta">Mayor sesgo · menor costo</p></article>
-        <article class="card"><h3>k = 5 o 10</h3><p>Equilibrio empírico entre entrenamiento, estabilidad y costo.</p><p class="accent">Recomendación habitual</p></article>
-        <article class="card"><h3>k alto / LOOCV</h3><p>Casi todo el dataset entrena, pero las estimaciones se correlacionan.</p><p class="magenta">Menor sesgo · mayor varianza</p></article>
+      <div class="bias-comparison-wrap">
+        <table class="bias-comparison">
+          <thead>
+            <tr>
+              <th scope="col">Comparación</th>
+              <th scope="col" class="k-low">k = 2–3<small>Pocos folds</small></th>
+              <th scope="col" class="k-mid">k = 5–10<small>Valor habitual</small></th>
+              <th scope="col" class="k-high">k = N<small>LOOCV</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Datos para entrenar</th>
+              <td data-label="k = 2–3"><span class="cell-value">50–66 %</span><span class="cell-note">del conjunto</span></td>
+              <td data-label="k = 5–10"><span class="cell-value">80–90 %</span><span class="cell-note">del conjunto</span></td>
+              <td data-label="k = N"><span class="cell-value">N − 1</span><span class="cell-note">casi todos los datos</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Sesgo de la estimación</th>
+              <td data-label="k = 2–3"><span class="cell-value">Mayor</span><span class="cell-note">puede sobrestimar el error</span></td>
+              <td data-label="k = 5–10"><span class="cell-value">Moderado</span><span class="cell-note">compromiso práctico</span></td>
+              <td data-label="k = N"><span class="cell-value">Menor</span><span class="cell-note">estimación casi insesgada</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Variabilidad</th>
+              <td data-label="k = 2–3"><span class="cell-value">Menor</span><span class="cell-note">entre estimaciones</span></td>
+              <td data-label="k = 5–10"><span class="cell-value">Equilibrada</span><span class="cell-note">en la práctica</span></td>
+              <td data-label="k = N"><span class="cell-value">Mayor</span><span class="cell-note">por alta correlación</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Costo</th>
+              <td data-label="k = 2–3"><span class="cell-value">Bajo</span><span class="cell-note">2–3 entrenamientos</span></td>
+              <td data-label="k = 5–10"><span class="cell-value">Moderado</span><span class="cell-note">5–10 entrenamientos</span></td>
+              <td data-label="k = N"><span class="cell-value">Alto</span><span class="cell-note">N entrenamientos</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="bias-summary">Al aumentar k, disminuye el sesgo; el costo y la correlación entre estimaciones aumentan.</p>
       </div>
-      <p class="quote">El mejor valor de k depende del tamaño, la estructura y el costo de los errores del problema.</p>
     </section>
 
     <section class="slide" aria-label="Validación anidada">
@@ -788,6 +875,7 @@ print(matriz)`
       const leakageExamples = {
         incorrect: {
           title: "Código · Práctica incorrecta",
+          observation: "El scaler se ajusta antes de separar los folds y usa las 200 observaciones, incluidas las de test. Aunque la métrica coincida con la práctica correcta, la evaluación queda contaminada.",
           code: `from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
@@ -808,6 +896,7 @@ print("Se incluyeron también las observaciones de test.")`
         },
         correct: {
           title: "Código · Práctica correcta · Pipeline",
+          observation: "En cada fold, el scaler aprende sólo de las 160 observaciones de entrenamiento; las 40 de test no participan en el ajuste. Así se evita la fuga de información.",
           code: `from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_validate
@@ -831,6 +920,8 @@ print("De 200 registros, 160 son train y 40 quedan para test.")`
       };
       const leakageCodeTitle = document.getElementById("leakage-code-title");
       const leakageCode = document.getElementById("leakage-code");
+      const leakageObservationTitle = document.getElementById("leakage-observation-title");
+      const leakageObservation = document.getElementById("leakage-observation");
       const runLeakage = document.getElementById("run-leakage");
       const leakageOutput = document.getElementById("leakage-output");
       const leakageStatus = document.getElementById("leakage-status");
@@ -840,6 +931,8 @@ print("De 200 registros, 160 son train y 40 quedan para test.")`
         if (!example) return;
         if (leakageCodeTitle) leakageCodeTitle.textContent = example.title;
         if (leakageCode) leakageCode.textContent = example.code;
+        if (leakageObservationTitle) leakageObservationTitle.textContent = `Observación del código · ${key === "incorrect" ? "Práctica incorrecta" : "Práctica correcta"}`;
+        if (leakageObservation) leakageObservation.textContent = example.observation;
         leakageButtons.forEach(button => {
           const isActive = button.dataset.example === key;
           button.classList.toggle("active", isActive);
