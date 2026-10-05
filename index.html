@@ -70,6 +70,9 @@
       background: rgba(27, 29, 34, .96); border: 1px solid var(--line);
       border-radius: 1rem; padding: 1.25rem 1.4rem; box-shadow: 0 1rem 2.5rem var(--shadow);
     }
+    .balance-slide { align-items: center; text-align: center; }
+    .balance-slide > h2 { margin-inline: auto; }
+    .balance-slide > .grid { width: min(100%, 1180px); text-align: left; }
     .card p, .card li { font-size: 1.25rem; }
     ul { margin: .4rem 0 0; padding-left: 1.3rem; }
     li { margin: .4rem 0; }
@@ -108,16 +111,38 @@
     }
     .technical-layout {
       display: grid; grid-template-columns: minmax(0, 2fr) minmax(16rem, .9fr);
-      align-items: start; gap: 1.2rem; width: 100%; max-width: 1450px;
+      align-items: start; gap: 1.2rem; width: 100%; min-width: 0;
     }
     .technical-demo { max-width: none; min-width: 0; }
-    .technical-demo textarea { display: block; min-height: 15rem !important; }
+    .technical-demo textarea {
+      display: block; width: 100%; min-width: 0;
+      min-height: clamp(12rem, 34vh, 26rem) !important; max-height: 55vh;
+    }
     .technical-demo pre { max-width: none; }
     .technical-info { grid-template-columns: 1fr; gap: .8rem; }
     .technical-info .card { padding: 1rem 1.2rem; }
     .technical-info .card p { margin-bottom: 0; }
     .technical-layout.editor-expanded { grid-template-columns: minmax(0, 1fr); }
-    .technical-layout.editor-expanded .technical-demo textarea { min-height: 52vh !important; }
+    .technical-layout.editor-expanded .technical-demo textarea { min-height: clamp(18rem, 58vh, 42rem) !important; max-height: none; }
+    .technical-slide {
+      height: 100vh; min-height: 0; justify-content: flex-start;
+      overflow-y: auto; padding: clamp(1rem, 3vh, 2.5rem) clamp(1rem, 4vw, 4rem) 6rem;
+    }
+    .technical-slide > h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); }
+    .observation-cell { margin-top: 1rem; padding: 1rem 1.2rem; }
+    .observation-cell h3 { margin-bottom: .5rem; }
+    .observation-cell p { margin: 0; }
+    .leakage-demo { width: min(100%, 1100px); }
+    .leakage-demo pre { max-width: none; min-height: 12rem; }
+    .leakage-demo .interactive-controls { margin-bottom: 1rem; }
+    .leakage-demo .leakage-select.active { border-color: var(--cyan); }
+    .leakage-demo .leakage-select:not(.active) { background: rgba(27, 29, 34, .9); border-color: var(--line); }
+    .leakage-demo .leakage-select:hover, .leakage-demo .leakage-select:focus-visible {
+      background: #30343b; border-color: var(--cyan); color: var(--ink);
+    }
+    .leakage-demo .leakage-select.active:hover, .leakage-demo .leakage-select.active:focus-visible {
+      background: var(--navy); color: var(--ink);
+    }
     .slide.editor-expanded-slide {
       height: 100vh; min-height: 0; justify-content: flex-start;
       overflow-y: auto; padding-bottom: 6rem;
@@ -158,15 +183,25 @@
     @media (max-width: 800px) {
       body { overflow: auto; }
       .slide { min-height: 100svh; padding-bottom: 5rem; }
+      .technical-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
       .grid, .grid.three { grid-template-columns: 1fr; }
       .technical-layout { grid-template-columns: 1fr; }
       .technical-info { grid-template-columns: 1fr; }
+      .technical-demo textarea { min-height: 40vh !important; max-height: 60vh; font-size: 1rem !important; }
+      .technical-layout.editor-expanded .technical-demo textarea { min-height: 55vh !important; }
       .slide.editor-expanded-slide { height: auto; min-height: 100svh; overflow: visible; }
+      .technical-controls { align-items: stretch; }
+      .technical-controls button { flex: 1 1 9rem; }
       .flow { flex-direction: column; }
       .arrow { transform: rotate(90deg); }
       .folds { gap: .25rem; }
       .fold span { height: 2.1rem; }
       .controls { display: none; }
+    }
+    @media (min-width: 801px) {
+      .technical-layout:not(.editor-expanded) .technical-info {
+        justify-self: center; width: min(100%, 22rem);
+      }
     }
     @media print {
       body { overflow: visible; background: white; }
@@ -316,7 +351,7 @@
       <p class="small">Media alta + desviación baja suele ser una señal más confiable que una única métrica máxima.</p>
     </section>
 
-    <section class="slide compact" aria-label="Scikit-Learn">
+    <section class="slide compact technical-slide" aria-label="Scikit-Learn">
       <span class="eyebrow">7 · Implementación técnica en Scikit-Learn</span>
       <h2>Una evaluación reproducible con Scikit-Learn</h2>
       <div class="technical-layout">
@@ -336,13 +371,17 @@ scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
 
 print("Accuracy promedio:", scores.mean())
 print("Desviación estándar:", scores.std())</textarea>
-        <div class="interactive-controls" style="margin-top:1rem;">
+        <div class="interactive-controls technical-controls" style="margin-top:1rem;">
           <button id="run-python" type="button">Ejecutar código</button>
           <button id="reset-python" type="button">Restablecer</button>
           <button id="expand-editor" type="button" aria-expanded="false" aria-controls="python-code">Ampliar editor</button>
           <span id="py-status" class="small"></span>
         </div>
         <pre style="margin-top:1rem; min-height: 6rem;"><code id="python-output" style="white-space: pre-wrap;">Salida aparecerá aquí...</code></pre>
+        <article class="card observation-cell" aria-labelledby="observation-title">
+          <h3 id="observation-title" class="accent">Observaciones · cross_val_score</h3>
+          <p id="python-observation" aria-live="polite">Se calcula una métrica por fold. La media resume el rendimiento y una desviación estándar baja indica resultados más consistentes entre particiones.</p>
+        </article>
       </div>
         <div class="grid technical-info">
           <div class="card">
@@ -361,20 +400,20 @@ print("Desviación estándar:", scores.std())</textarea>
       </div>
     </section>
 
-    <section class="slide" aria-label="Ventajas de la validación cruzada">
+    <section class="slide balance-slide" aria-label="Ventajas de la validación cruzada">
       <span class="eyebrow">8 · Balance comparativo · Ventajas</span>
       <h2>¿Qué aporta la validación cruzada?</h2>
       <div class="grid three">
-        <article class="card good"><h3><strong>Estimación más robusta</strong></h3><p>Anticipa mejor el rendimiento en datos nuevos al promediar varios folds.</p></article>
-        <article class="card good"><h3><strong>Menos sesgo de partición</strong></h3><p>Evita depender de una única división favorable o atípica.</p></article>
-        <article class="card good"><h3><strong>Aprovecha los datos</strong></h3><p>Cada observación participa en entrenamiento y evaluación.</p></article>
-        <article class="card good"><h3><strong>Comparación justa</strong></h3><p>Permite contrastar modelos bajo las mismas particiones.</p></article>
-        <article class="card good"><h3><strong>Mejor diagnóstico</strong></h3><p>La variación entre folds ayuda a detectar inestabilidad y sobreajuste.</p></article>
-        <article class="card good"><h3><strong>Apoya la búsqueda</strong></h3><p>Es la base de Grid Search y otros métodos para ajustar hiperparámetros.</p></article>
+        <article class="card good"><h3><strong>Estimación más robusta</strong></h3><p>Promedia el rendimiento obtenido en varios folds y ofrece una estimación más estable que una sola partición. Ayuda a anticipar cómo responderá el modelo ante datos no vistos.</p></article>
+        <article class="card good"><h3><strong>Menos sesgo de partición</strong></h3><p>Reduce la dependencia de un único corte aleatorio, que podría resultar inusualmente fácil o difícil. Así, las conclusiones dependen menos de qué observaciones quedaron en test.</p></article>
+        <article class="card good"><h3><strong>Aprovecha los datos</strong></h3><p>En cada iteración, una parte distinta se reserva para evaluar y el resto se usa para entrenar. Al completar los folds, todas las observaciones han participado en ambas etapas.</p></article>
+        <article class="card good"><h3><strong>Comparación justa</strong></h3><p>Evaluar distintos modelos con los mismos folds permite comparar sus resultados bajo condiciones equivalentes. Esto hace más reproducible la elección del modelo.</p></article>
+        <article class="card good"><h3><strong>Mejor diagnóstico</strong></h3><p>La media y la variación entre folds muestran tanto el rendimiento como su estabilidad. Diferencias entre entrenamiento y evaluación también pueden advertir sobreajuste.</p></article>
+        <article class="card good"><h3><strong>Apoya la búsqueda</strong></h3><p>Permite evaluar sistemáticamente distintas configuraciones de hiperparámetros. Por eso se utiliza en herramientas como Grid Search y Random Search.</p></article>
       </div>
     </section>
 
-    <section class="slide" aria-label="Limitaciones de la validación cruzada">
+    <section class="slide balance-slide" aria-label="Limitaciones de la validación cruzada">
       <span class="eyebrow">8 · Balance comparativo · Limitaciones</span>
       <h2>¿Cuándo hay que tener cuidado?</h2>
       <div class="grid">
@@ -385,17 +424,19 @@ print("Desviación estándar:", scores.std())</textarea>
       </div>
     </section>
 
-    <section class="slide" aria-label="Data leakage">
+    <section class="slide compact" aria-label="Data leakage">
       <span class="eyebrow">9.2 · Buenas prácticas</span>
       <h2>Data leakage: cuando el futuro se filtra al entrenamiento</h2>
-      <div class="grid">
-        <article class="card bad"><h3><strong>✕ Incorrecto</strong></h3><p>Escalar o imputar usando todo <code>X</code> antes de validar.</p><p>El fold de test “enseña” sus medias y varianzas.</p></article>
-        <article class="card good"><h3><strong>✓ Correcto</strong></h3><p>Encapsular el preprocesamiento dentro de un <code>Pipeline</code>.</p><p>Cada transformación aprende sólo con los datos de train.</p></article>
+      <div class="interactive leakage-demo">
+        <div class="interactive-controls" role="group" aria-label="Elegir práctica de validación">
+          <button class="leakage-select active" type="button" data-example="incorrect" aria-pressed="true">✕ Práctica incorrecta</button>
+          <button class="leakage-select" type="button" data-example="correct" aria-pressed="false">✓ Práctica correcta</button>
+        </div>
+        <h3 id="leakage-title" class="accent">✕ Práctica incorrecta · Data leakage</h3>
+        <p id="leakage-description" class="small" aria-live="polite">El scaler aprende la media y la escala usando todo X, incluido el fold de test, antes de la validación. Esto filtra información y hace que la métrica sea demasiado optimista.</p>
+        <pre><code id="leakage-code" aria-live="polite"></code></pre>
       </div>
-      <pre><code>from sklearn.pipeline import make_pipeline
 
-pipe = make_pipeline(StandardScaler(), modelo)
-scores = cross_val_score(pipe, X, y, cv=5)</code></pre>
     </section>
 
     <section class="slide" aria-label="Sesgo y varianza">
@@ -588,6 +629,28 @@ scores = cross_val_score(pipe, X, y, cv=5)</code></pre>
       const pyStatus = document.getElementById("py-status");
       const expandEditor = document.getElementById("expand-editor");
       const technicalLayout = document.querySelector(".technical-layout");
+      const pyObservationTitle = document.getElementById("observation-title");
+      const pyObservation = document.getElementById("python-observation");
+      const codeObservations = {
+        code1: {
+          title: "Observaciones · cross_val_score",
+          text: "Se calcula una métrica por fold. La media resume el rendimiento y una desviación estándar baja indica resultados más consistentes entre particiones."
+        },
+        code2: {
+          title: "Observaciones · cross_validate",
+          text: "Se calculan varias métricas a la vez. Compara el F1 de entrenamiento y de prueba: una diferencia grande puede ser señal de sobreajuste."
+        },
+        code3: {
+          title: "Observaciones · cross_val_predict",
+          text: "La matriz de confusión resume las predicciones out-of-fold. Los valores de la diagonal son aciertos; los demás muestran en qué clases se equivoca el modelo."
+        }
+      };
+      function updateCodeObservation(codeKey) {
+        const observation = codeObservations[codeKey];
+        if (!observation) return;
+        if (pyObservationTitle) pyObservationTitle.textContent = observation.title;
+        if (pyObservation) pyObservation.textContent = observation.text;
+      }
       if (pyStatus) pyStatus.textContent = "";
       expandEditor?.addEventListener("click", () => {
         const isExpanded = technicalLayout?.classList.toggle("editor-expanded") ?? false;
@@ -670,6 +733,7 @@ matriz = confusion_matrix(y, predicciones)
 print(matriz)`
       };
       let currentCodeKey = "code1";
+      updateCodeObservation(currentCodeKey);
       if (pyCode) pyCode.value = codeOptions[currentCodeKey];
       const pySelectBtns = document.querySelectorAll(".py-select");
       pySelectBtns.forEach(btn => {
@@ -678,6 +742,7 @@ print(matriz)`
           if (!target || !codeOptions[target] || !pyCode) return;
           currentCodeKey = target;
           pyCode.value = codeOptions[target];
+          updateCodeObservation(target);
           pySelectBtns.forEach(b => {
             const isActive = b === btn;
             b.classList.toggle("active", isActive);
@@ -686,6 +751,51 @@ print(matriz)`
           if (pyOut) pyOut.textContent = "Salida aparecerá aquí...";
           if (pyStatus) pyStatus.textContent = "";
         });
+      });
+
+      const leakageExamples = {
+        incorrect: {
+          title: "✕ Práctica incorrecta · Data leakage",
+          description: "El scaler aprende la media y la escala usando todo X, incluido el fold de test, antes de la validación. Esto filtra información y hace que la métrica sea demasiado optimista.",
+          code: `from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+
+# Incorrecto: el scaler ve también los datos de test
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+scores = cross_val_score(model, X_scaled, y, cv=5)`
+        },
+        correct: {
+          title: "✓ Práctica correcta · Uso de Pipeline",
+          description: "El Pipeline ajusta el scaler dentro de cada fold: sólo aprende de los datos de entrenamiento y después transforma el fold de test.",
+          code: `from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import cross_val_score
+
+# Correcto: el scaler se ajusta sólo en train
+pipe = make_pipeline(StandardScaler(), model)
+scores = cross_val_score(pipe, X, y, cv=5)`
+        }
+      };
+      const leakageTitle = document.getElementById("leakage-title");
+      const leakageDescription = document.getElementById("leakage-description");
+      const leakageCode = document.getElementById("leakage-code");
+      const leakageButtons = document.querySelectorAll(".leakage-select");
+      function selectLeakageExample(key) {
+        const example = leakageExamples[key];
+        if (!example) return;
+        if (leakageTitle) leakageTitle.textContent = example.title;
+        if (leakageDescription) leakageDescription.textContent = example.description;
+        if (leakageCode) leakageCode.textContent = example.code;
+        leakageButtons.forEach(button => {
+          const isActive = button.dataset.example === key;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+      }
+      selectLeakageExample("incorrect");
+      leakageButtons.forEach(button => {
+        button.addEventListener("click", () => selectLeakageExample(button.dataset.example));
       });
 
       // Toggle code blocks on click (cleanup if present)
