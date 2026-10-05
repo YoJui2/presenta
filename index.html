@@ -361,12 +361,27 @@ print("Desviación estándar:", scores.std())</textarea>
       </div>
     </section>
 
-    <section class="slide" aria-label="Ventajas y limitaciones">
-      <span class="eyebrow">8 · Balance comparativo</span>
-      <h2>Potente, pero no automática</h2>
+    <section class="slide" aria-label="Ventajas de la validación cruzada">
+      <span class="eyebrow">8 · Balance comparativo · Ventajas</span>
+      <h2>¿Qué aporta la validación cruzada?</h2>
+      <div class="grid three">
+        <article class="card good"><h3><strong>Estimación más robusta</strong></h3><p>Anticipa mejor el rendimiento en datos nuevos al promediar varios folds.</p></article>
+        <article class="card good"><h3><strong>Menos sesgo de partición</strong></h3><p>Evita depender de una única división favorable o atípica.</p></article>
+        <article class="card good"><h3><strong>Aprovecha los datos</strong></h3><p>Cada observación participa en entrenamiento y evaluación.</p></article>
+        <article class="card good"><h3><strong>Comparación justa</strong></h3><p>Permite contrastar modelos bajo las mismas particiones.</p></article>
+        <article class="card good"><h3><strong>Mejor diagnóstico</strong></h3><p>La variación entre folds ayuda a detectar inestabilidad y sobreajuste.</p></article>
+        <article class="card good"><h3><strong>Apoya la búsqueda</strong></h3><p>Es la base de Grid Search y otros métodos para ajustar hiperparámetros.</p></article>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Limitaciones de la validación cruzada">
+      <span class="eyebrow">8 · Balance comparativo · Limitaciones</span>
+      <h2>¿Cuándo hay que tener cuidado?</h2>
       <div class="grid">
-        <article class="card good"><h3><strong>Ventajas</strong></h3><ul><li>Estimación más robusta.</li><li>Uso integral del corpus.</li><li>Comparación reproducible.</li><li>Diagnóstico de sobreajuste.</li></ul></article>
-        <article class="card bad"><h3><strong>Limitaciones</strong></h3><ul><li>Multiplica el costo computacional.</li><li>No respeta por sí sola tiempo o grupos.</li><li>Puede ser innecesaria en Big Data.</li><li>Es vulnerable al data leakage.</li></ul></article>
+        <article class="card bad"><h3><strong>Mayor costo computacional</strong></h3><p>Entrenar k modelos cuesta aproximadamente k veces más que una sola evaluación.</p></article>
+        <article class="card bad"><h3><strong>Respeta la estructura de los datos</strong></h3><p>Para series temporales o grupos, usa divisiones específicas como TimeSeriesSplit o GroupKFold.</p></article>
+        <article class="card bad"><h3><strong>No siempre escala</strong></h3><p>En conjuntos enormes, un hold-out representativo puede ser más práctico.</p></article>
+        <article class="card bad"><h3><strong>Evita la fuga de datos</strong></h3><p>Incluye el preprocesamiento en un Pipeline para ajustarlo dentro de cada fold.</p></article>
       </div>
     </section>
 
