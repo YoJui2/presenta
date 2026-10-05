@@ -96,6 +96,36 @@
       margin: 1rem 0 0; padding: .8rem 1rem; border-left: 5px solid var(--lime);
       background: rgba(27, 29, 34, .9); color: var(--ink); font-weight: 700;
     }
+    .nested-slide {
+      height: 100vh; min-height: 0; justify-content: flex-start;
+      overflow-y: auto; padding: clamp(1rem, 3vh, 2.5rem) clamp(1rem, 4vw, 4rem) 6rem;
+    }
+    .nested-slide > h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); }
+    .nested-layout {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      align-items: start; gap: 1.2rem; width: 100%; max-width: 1500px; min-width: 0;
+    }
+    .nested-explanation { display: grid; gap: .8rem; }
+    .nested-explanation .card { padding: 1rem 1.2rem; }
+    .nested-explanation .card p { margin-bottom: 0; }
+    .nested-code { min-width: 0; }
+    .nested-code pre {
+      max-width: none; height: clamp(9rem, 24vh, 14rem); margin: .6rem 0 0; overflow: auto;
+      font-size: clamp(.82rem, 1.05vw, 1rem); line-height: 1.42;
+    }
+    .nested-code pre code { white-space: pre; }
+    .nested-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .nested-controls button {
+      min-height: 3rem; padding: .5rem 1rem; border: 2px solid var(--cyan);
+      border-radius: .6rem; background: var(--navy); color: var(--ink);
+      font: inherit; font-weight: 700; cursor: pointer;
+    }
+    .nested-controls button:hover, .nested-controls button:focus-visible { background: var(--cyan); color: var(--navy); }
+    .nested-code pre.nested-output {
+      height: 4.5rem; min-height: 4.5rem; padding: .65rem .8rem; margin: .5rem 0 0;
+      font-size: .9rem; line-height: 1.35;
+    }
+    .nested-output code { white-space: pre-wrap; overflow-wrap: anywhere; }
     .card p, .card li { font-size: 1.25rem; }
     ul { margin: .4rem 0 0; padding-left: 1.3rem; }
     li { margin: .4rem 0; }
@@ -254,6 +284,9 @@
       .technical-layout { grid-template-columns: 1fr; }
       .technical-info { grid-template-columns: 1fr; }
       .leakage-layout { grid-template-columns: 1fr; }
+      .nested-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
+      .nested-layout { grid-template-columns: 1fr; }
+      .nested-code pre { height: 32svh; font-size: .9rem; }
       .leakage-demo .leakage-code-cell { max-height: 45svh; }
       .technical-demo textarea { min-height: 40vh !important; max-height: 60vh; font-size: 1rem !important; }
       .technical-layout.editor-expanded .technical-demo textarea { min-height: 55vh !important; }
@@ -437,8 +470,8 @@ modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 
 scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
 
-print("Accuracy promedio:", scores.mean())
-print("Desviación estándar:", scores.std())</textarea>
+print("Accuracy promedio:", round(scores.mean(), 2))
+print("Desviación estándar:", round(scores.std(), 2))</textarea>
         <div class="interactive-controls technical-controls" style="margin-top:1rem;">
           <button id="run-python" type="button">Ejecutar código</button>
           <button id="reset-python" type="button">Restablecer</button>
@@ -570,15 +603,51 @@ print("Desviación estándar:", scores.std())</textarea>
       </div>
     </section>
 
-    <section class="slide" aria-label="Validación anidada">
+    <section class="slide compact nested-slide" aria-label="Optimización y validación anidada">
       <span class="eyebrow">9.3 · Optimización y validación anidada</span>
       <h2>Nested Cross-Validation</h2>
-      <div class="flow">
-        <div><strong class="magenta">Bucle interno</strong><br>elige hiperparámetros</div><span class="arrow">→</span>
-        <div><strong class="accent">Bucle externo</strong><br>evalúa el modelo final</div><span class="arrow">→</span>
-        <div><strong class="lime">Estimación</strong><br>más imparcial</div>
+      <div class="nested-layout">
+        <div class="nested-explanation">
+          <p class="lead">Si se reporta como rendimiento esperado el mejor puntaje usado para elegir hiperparámetros, aparece un sesgo de selección optimista.</p>
+          <article class="card">
+            <h3 class="magenta">Bucle interno · selección</h3>
+            <p>GridSearchCV compara las combinaciones de hiperparámetros usando sólo subfolds del conjunto de entrenamiento.</p>
+          </article>
+          <article class="card">
+            <h3 class="accent">Bucle externo · evaluación</h3>
+            <p>Cada fold externo evalúa el mejor modelo sin que sus datos hayan participado en la selección. La media de esos puntajes estima el rendimiento de generalización.</p>
+          </article>
+          <p class="small"><strong>No reportes</strong> <code>best_score_</code> como estimación final. La validación anidada requiere más cómputo: cada fold externo ejecuta una búsqueda interna.</p>
+        </div>
+        <article class="interactive nested-code" aria-label="Ejemplo de código de validación anidada con Scikit-Learn">
+          <h3 class="accent">Código · Nested CV</h3>
+          <pre><code id="nested-code">from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV, KFold, cross_val_score
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+X, y = make_classification(n_samples=300, n_features=8, n_informative=5,
+                           n_redundant=2, random_state=42)
+model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
+param_grid = {"logisticregression__C": [0.1, 1, 10]}
+
+inner_cv = KFold(n_splits=3, shuffle=True, random_state=1)
+clf = GridSearchCV(model, param_grid, cv=inner_cv, scoring="accuracy")
+outer_cv = KFold(n_splits=5, shuffle=True, random_state=2)
+nested_scores = cross_val_score(clf, X, y, cv=outer_cv, scoring="accuracy")
+
+print("Accuracy por fold externo:", [round(score, 2) for score in nested_scores])
+print("Rendimiento Nested CV:", round(nested_scores.mean(), 2))
+print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
+          <div class="nested-controls">
+            <button id="run-nested" type="button">Ejecutar código</button>
+            <span id="nested-status" class="small" role="status"></span>
+          </div>
+          <h3 class="accent">Salida</h3>
+          <pre class="nested-output"><code id="nested-output" aria-live="polite">La salida aparecerá aquí...</code></pre>
+        </article>
       </div>
-      <p class="lead">Separar selección y evaluación evita reportar como rendimiento esperado el mejor resultado usado para elegir el modelo.</p>
     </section>
 
     <section class="slide compact" aria-label="Glosario y referencias">
@@ -830,8 +899,8 @@ modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 
 scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
 
-print("Accuracy promedio:", scores.mean())
-print("Desviación estándar:", scores.std())`,
+print("Accuracy promedio:", round(scores.mean(), 2))
+print("Desviación estándar:", round(scores.std(), 2))`,
         code2: `from sklearn.model_selection import cross_validate
 
 from sklearn.ensemble import RandomForestClassifier
@@ -840,8 +909,8 @@ modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 
 cv_results = cross_validate(modelo, X, y, scoring=["accuracy", "precision_macro", "recall_macro", "f1_macro"], cv=5, return_train_score=True)
 
-print("Test F1 Macro:", cv_results["test_f1_macro"].mean())
-print("Train F1 Macro:", cv_results["train_f1_macro"].mean())  # Permite auditar overfitting`,
+print("Test F1 Macro:", round(cv_results["test_f1_macro"].mean(), 2))
+print("Train F1 Macro:", round(cv_results["train_f1_macro"].mean(), 2))  # Permite auditar overfitting`,
         code3: `from sklearn.model_selection import cross_val_predict
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
@@ -889,8 +958,8 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 scores = cross_val_score(model, X_scaled, y, cv=5, scoring="accuracy")
 
-print("Accuracy por fold:", scores)
-print("Accuracy promedio:", scores.mean())
+print("Accuracy por fold:", [round(score, 2) for score in scores])
+print("Accuracy promedio:", round(scores.mean(), 2))
 print("Observaciones usadas para ajustar el scaler:", scaler.n_samples_seen_)
 print("Se incluyeron también las observaciones de test.")`
         },
@@ -912,8 +981,8 @@ cv_results = cross_validate(pipe, X, y, cv=5, scoring="accuracy", return_estimat
 scores = cv_results["test_score"]
 scaler = cv_results["estimator"][0].named_steps["standardscaler"]
 
-print("Accuracy por fold:", scores)
-print("Accuracy promedio:", scores.mean())
+print("Accuracy por fold:", [round(score, 2) for score in scores])
+print("Accuracy promedio:", round(scores.mean(), 2))
 print("Observaciones usadas por el scaler en el primer fold:", scaler.n_samples_seen_)
 print("De 200 registros, 160 son train y 40 quedan para test.")`
         }
@@ -966,6 +1035,36 @@ sys.stderr = StringIO()
           if (leakageStatus) leakageStatus.textContent = "Error al ejecutar";
         } finally {
           runLeakage.disabled = false;
+        }
+      });
+
+      const nestedCode = document.getElementById("nested-code");
+      const runNested = document.getElementById("run-nested");
+      const nestedOutput = document.getElementById("nested-output");
+      const nestedStatus = document.getElementById("nested-status");
+      runNested?.addEventListener("click", async () => {
+        if (!nestedCode || !nestedOutput) return;
+        runNested.disabled = true;
+        nestedOutput.textContent = "";
+        if (nestedStatus) nestedStatus.textContent = "Ejecutando...";
+        try {
+          const py = await ensurePyodide(nestedStatus);
+          await py.runPythonAsync(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+`);
+          await py.runPythonAsync(nestedCode.textContent);
+          const stdout = await py.runPythonAsync("sys.stdout.getvalue()");
+          const stderr = await py.runPythonAsync("sys.stderr.getvalue()");
+          nestedOutput.textContent = (stdout || "") + (stderr ? "\n" + stderr : "") || "Sin salida";
+          if (nestedStatus) nestedStatus.textContent = "Ejecución completada";
+        } catch (error) {
+          nestedOutput.textContent = error.toString();
+          if (nestedStatus) nestedStatus.textContent = "Error al ejecutar";
+        } finally {
+          runNested.disabled = false;
         }
       });
 
