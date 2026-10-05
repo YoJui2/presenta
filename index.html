@@ -449,7 +449,68 @@
         <div><strong class="accent">Modelo</strong><br>clasifica aprobado / no aprobado</div><span class="arrow">→</span>
         <div><strong class="magenta">Validación</strong><br>K-Fold estándar, k = 5</div>
       </div>
+<<<<<<< HEAD
       <p class="lead">En Educational Data Mining, anticipar la condición final permite tutorías y alertas tempranas.</p>
+=======
+      <p class="lead">Con pocos datos, un hold-out puede depender demasiado de qué estudiantes cayeron en test. K-Fold reduce esa dependencia.</p>
+    </section>
+
+    <section class="slide compact" aria-label="Ejemplo práctico interactivo">
+      <span class="eyebrow">Ejemplo práctico interactivo</span>
+      <h2>Probemos distintos valores de <span class="accent">k</span></h2>
+      <p class="lead">Hay 10 observaciones de estudiantes. Elegí cuántos folds usar y observá qué grupo queda como test en cada vuelta.</p>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="fold-range"><strong>Folds:</strong> <output id="fold-value">5</output></label>
+          <input id="fold-range" type="range" min="2" max="10" value="5" step="1">
+          <button id="next-fold" type="button">Cambiar vuelta</button>
+        </div>
+        <div id="demo-folds" class="demo-folds" aria-label="Distribución interactiva de observaciones"></div>
+        <p id="demo-status" class="small"></p>
+        <p class="formula">Accuracy promedio: <span id="demo-score">—</span></p>
+      </div>
+      <p class="small">La métrica es ilustrativa: la interacción muestra la lógica de particionar, entrenar, evaluar y promediar.</p>
+    </section>
+
+    <section class="slide compact" aria-label="Ejemplo interactivo de métricas">
+      <span class="eyebrow">Ejemplo práctico · Métricas</span>
+      <h2>¿Qué cambia cuando ajustamos el umbral?</h2>
+      <p class="lead">En una alerta temprana, mover el umbral cambia el equilibrio entre detectar estudiantes en riesgo y generar falsas alarmas.</p>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="threshold-range"><strong>Umbral:</strong> <output id="threshold-value">0,50</output></label>
+          <input id="threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
+        </div>
+        <table class="confusion-table">
+          <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
+          <tbody>
+            <tr><th>Real: riesgo</th><td id="tp-cell">TP: —</td><td id="fn-cell">FN: —</td></tr>
+            <tr><th>Real: no riesgo</th><td id="fp-cell">FP: —</td><td id="tn-cell">TN: —</td></tr>
+          </tbody>
+        </table>
+        <p id="metrics-status" class="small"></p>
+        <p class="formula">Precision: <span id="precision-value">—</span> · Recall: <span id="recall-value">—</span> · F1: <span id="f1-value">—</span></p>
+      </div>
+      <p class="small">La matriz es ilustrativa: sirve para interpretar métricas, no para evaluar un modelo real.</p>
+    </section>
+
+    <section class="slide compact" aria-label="Tipos y estrategias">
+      <span class="eyebrow">5 · Tipos y estrategias de validación cruzada</span>
+      <h2>No todos los datos se validan igual</h2>
+      <div class="grid">
+        <article class="card"><h3 class="accent">Hold-out</h3><p>Una división 80/20 o 70/30. Rápida, pero sensible al corte.</p></article>
+        <article class="card"><h3 class="accent">K-Fold</h3><p>Uso general. Habitualmente k = 5 o 10.</p></article>
+        <article class="card"><h3 class="accent">Stratified K-Fold</h3><p>Conserva la proporción de clases. Ideal para clasificación desbalanceada.</p></article>
+        <article class="card"><h3 class="accent">TimeSeriesSplit</h3><p>Respeta el orden temporal. Nunca entrena con el futuro.</p></article>
+        <article class="card"><h3 class="accent">GroupKFold</h3><p>Mantiene juntos grupos relacionados para evitar contaminación.</p></article>
+        <article class="card"><h3 class="accent">LOO / LPO</h3><p>Deja una o p observaciones afuera. Poco sesgo, alto costo.</p></article>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Métricas">
+      <span class="eyebrow">6 · Métricas de evaluación</span>
+      <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
+>>>>>>> 43cdd5d11d6dbfe2f2faa65bf90f556f3945b757
       <div class="grid">
         <article class="card bad"><h3>Hold-out</h3><p>Con pocos datos hay alto riesgo de sesgo muestral: la métrica depende de qué estudiantes quedaron en prueba.</p></article>
         <article class="card good"><h3>K-Fold estándar</h3><p>5 pliegues de 20 estudiantes: cada iteración entrena con 80 y prueba con 20.</p></article>
@@ -713,13 +774,11 @@ print("Desviación estándar:", round(scores.std(), 2))</textarea>
     <section class="slide balance-slide" aria-label="Ventajas de la validación cruzada">
       <span class="eyebrow">8 · Balance comparativo · Ventajas</span>
       <h2>¿Qué aporta la validación cruzada?</h2>
-      <div class="grid three">
+      <div class="grid">
         <article class="card good"><h3><strong>Estimación más robusta</strong></h3><p>Promedia el rendimiento obtenido en varios folds y ofrece una estimación más estable que una sola partición. Ayuda a anticipar cómo responderá el modelo ante datos no vistos.</p></article>
-        <article class="card good"><h3><strong>Menos sesgo de partición</strong></h3><p>Reduce la dependencia de un único corte aleatorio, que podría resultar inusualmente fácil o difícil. Así, las conclusiones dependen menos de qué observaciones quedaron en test.</p></article>
         <article class="card good"><h3><strong>Aprovecha los datos</strong></h3><p>En cada iteración, una parte distinta se reserva para evaluar y el resto se usa para entrenar. Al completar los folds, todas las observaciones han participado en ambas etapas.</p></article>
         <article class="card good"><h3><strong>Comparación justa</strong></h3><p>Evaluar distintos modelos con los mismos folds permite comparar sus resultados bajo condiciones equivalentes. Esto hace más reproducible la elección del modelo.</p></article>
         <article class="card good"><h3><strong>Mejor diagnóstico</strong></h3><p>La media y la variación entre folds muestran tanto el rendimiento como su estabilidad. Diferencias entre entrenamiento y evaluación también pueden advertir sobreajuste.</p></article>
-        <article class="card good"><h3><strong>Apoya la búsqueda</strong></h3><p>Permite evaluar sistemáticamente distintas configuraciones de hiperparámetros. Por eso se utiliza en herramientas como Grid Search y Random Search.</p></article>
       </div>
     </section>
 
