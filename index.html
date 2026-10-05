@@ -304,6 +304,60 @@
         justify-self: center; width: min(100%, 22rem);
       }
     }
+    .kf { display: grid; gap: .5rem; max-width: 1100px; margin: 1rem 0; }
+    .kf-row { display: grid; grid-template-columns: 8.5rem repeat(5, minmax(0, 1fr)); gap: .4rem; align-items: stretch; }
+    .kf-row b { align-self: center; color: var(--muted); font-size: 1.1rem; }
+    .kf-row .c { text-align: center; padding: .55rem 0; border-radius: .4rem; border: 1px solid var(--line); font-weight: 800; font-size: 1.05rem; }
+    .kf-row .tr { background: #ffffff; color: var(--navy); }
+    .kf-row .te { background: var(--magenta); border-color: var(--magenta); color: #ffffff; }
+    .kf-row .un { background: transparent; border-style: dashed; color: var(--muted); }
+    .bars { display: grid; gap: .6rem; margin-top: .8rem; }
+    .bar-row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem; gap: .7rem; align-items: center; font-size: 1.25rem; }
+    .bar-row i { display: block; height: 1.4rem; border-radius: .4rem; background: linear-gradient(90deg, #ffffff, var(--magenta)); }
+    @media (max-width: 800px) { .kf-row { grid-template-columns: 5.5rem repeat(5, minmax(0, 1fr)); } .kf-row .c { font-size: .85rem; } }
+    .math { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; width: fit-content; max-width: 100%; margin: .8rem 0; padding: 1rem 1.6rem; background: #050505; border: 2px solid var(--blue); border-radius: .8rem; color: var(--ink); font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", serif; font-size: clamp(1.4rem, 2.6vw, 2.4rem); line-height: 1.2; }
+    .math sub { font-size: .62em; line-height: 0; }
+    .math .frac { display: inline-flex; flex-direction: column; align-items: center; text-align: center; }
+    .math .frac > span:first-child { padding: 0 .3em .12em; border-bottom: .06em solid currentColor; }
+    .math .frac > span:last-child { padding-top: .12em; }
+    .math .sum { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; }
+    .math .sum .big { font-size: 2.1em; line-height: 1; }
+    .math .sum .lim { font-size: .6em; }
+    @keyframes cvUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes cvGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .cv-anim.active .card, .cv-anim.active .interactive, .cv-anim.active .math, .cv-anim.active .confusion-table, .cv-anim.active .flow, .cv-anim.active .kf-row { animation: cvUp .5s both; }
+    .cv-anim.active .grid > :nth-child(2) { animation-delay: .1s; }
+    .cv-anim.active .grid > :nth-child(3) { animation-delay: .2s; }
+    .cv-anim.active .grid > :nth-child(4) { animation-delay: .3s; }
+    .cv-anim.active .grid > :nth-child(5) { animation-delay: .4s; }
+    .cv-anim.active .grid > :nth-child(6) { animation-delay: .5s; }
+    .cv-anim.active .bar-row i { animation: cvGrow .9s ease-out both; transform-origin: left; }
+    .bar-row i { transition: width .5s ease; }
+    .bar-row[data-acc] { cursor: pointer; padding: .2rem .4rem; border-radius: .5rem; border: 1px solid transparent; }
+    .bar-row[data-acc]:hover, .bar-row.sel { border-color: var(--magenta); background: rgba(255, 48, 48, .1); }
+    .cost .bar-row { grid-template-columns: 12rem minmax(0, 1fr) 9rem; }
+    .cost .bar-row b { text-align: right; }
+    .kf-row { transition: opacity .3s; }
+    .kf-row.dim { opacity: .22; }
+    .kf-bar { margin: 1rem 0; }
+    .cv-opt, .interactive .cv-opt { min-height: 2.5rem; padding: .4rem .9rem; border: 2px solid var(--line); border-radius: .6rem; background: rgba(27, 29, 34, .9); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+    .cv-opt.active, .interactive .cv-opt.active { border-color: var(--cyan); background: var(--navy); color: var(--ink); }
+    .cv-opt:hover, .interactive .cv-opt:hover, .cv-opt:focus-visible, .interactive .cv-opt:focus-visible { background: #30343b; border-color: var(--cyan); color: var(--ink); }
+    .cv-controls { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: .6rem 0 1rem; }
+    .dot { display: inline-block; width: 1.15rem; height: 1.15rem; border-radius: 50%; border: 2px solid transparent; transition: background .35s, border-color .35s; }
+    .dot.vp, .dot.risk { background: var(--magenta); border-color: var(--magenta); }
+    .dot.fn { background: transparent; border-color: var(--magenta); }
+    .dot.fp, .dot.ok { background: #ffffff; border-color: #ffffff; }
+    .dot.vn { background: rgba(255, 255, 255, .14); }
+    .dots { display: grid; grid-template-columns: repeat(10, 1.15rem); gap: .25rem; width: max-content; }
+    .cv-split { display: grid; grid-template-columns: minmax(0, 1.3fr) auto; gap: 1.5rem; align-items: center; }
+    .strat-folds { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+    .strat-col { display: grid; gap: .5rem; justify-items: center; padding: .7rem .4rem; border: 1px solid var(--line); border-radius: .8rem; background: rgba(16, 17, 20, .72); }
+    .strat-col.warn { border-color: var(--magenta); background: rgba(255, 48, 48, .12); }
+    .strat-dots { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center; }
+    .strat-col small { color: var(--muted); font-size: 1rem; }
+    @media (max-width: 800px) { .cv-split { grid-template-columns: 1fr; } .strat-folds { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cost .bar-row { grid-template-columns: 7rem minmax(0, 1fr) 6rem; } }
+    @media (prefers-reduced-motion: reduce) { .cv-anim *, .cv-anim.active * { animation: none !important; transition: none !important; } }
     @media print {
       body { overflow: visible; background: white; }
       .slide, .slide.active { display: flex; min-height: 100vh; page-break-after: always; color: #08152d; background: white; }
@@ -357,99 +411,254 @@
       </div>
     </section>
 
-    <section class="slide compact" aria-label="Funcionamiento matemático y algorítmico">
+    <!-- ===== TEMA 4 · Funcionamiento matemático y algorítmico ===== -->
+    <section class="slide cv-anim compact technical-slide" aria-label="K-Fold estándar: partición">
       <span class="eyebrow">4 · Funcionamiento matemático y algorítmico</span>
-      <h2>K-Fold en una imagen</h2>
-      <p class="lead">Con <strong>k = 5</strong>, cada vuelta reserva un pliegue para test y utiliza los otros cuatro para entrenar.</p>
-      <div class="folds" aria-label="Cinco iteraciones de K-Fold">
-        <div class="fold"><span class="test"></span><span class="train"></span><label>Vuelta 1</label></div>
-        <div class="fold"><span class="train"></span><span class="test"></span><label>Vuelta 2</label></div>
-        <div class="fold"><span class="train"></span><span class="test"></span><label>Vuelta 3</label></div>
-        <div class="fold"><span class="train"></span><span class="test"></span><label>Vuelta 4</label></div>
-        <div class="fold"><span class="train"></span><span class="test"></span><label>Vuelta 5</label></div>
+      <h2>K-Fold estándar con <span class="accent">k = 5</span> y N = 1000</h2>
+      <p class="lead">Con k = 5, los datos se particionan en cinco bloques disjuntos de 200 observaciones. Cada iteración prueba con un bloque y entrena con el resto. Cambiá k y reproducí las iteraciones.</p>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="kf-k"><strong>Folds (k):</strong> <output id="kf-k-val">5</output></label>
+          <input id="kf-k" type="range" min="0" max="4" value="2" step="1" aria-label="Cantidad de folds">
+          <button id="kf-next" type="button">Siguiente iteración ▶</button>
+          <button id="kf-auto" type="button">▶ Reproducir</button>
+        </div>
+        <div id="kf-bar" class="kf-row kf-bar" aria-live="polite"></div>
+        <p id="kf-text" class="small"></p>
       </div>
       <div class="grid">
-        <div class="card"><h3><span class="accent">Blanco</span> · entrenamiento</h3><p>El modelo ajusta sus parámetros con los datos disponibles.</p></div>
-        <div class="card"><h3><span class="magenta">Rosa</span> · validación</h3><p>El modelo predice datos que no utilizó en esa vuelta.</p></div>
+        <div class="card"><h3><span class="accent">Blanco</span> · entrenamiento</h3><p>Todos los folds menos uno.</p></div>
+        <div class="card"><h3><span class="magenta">Rojo</span> · prueba</h3><p>Un fold distinto en cada iteración.</p></div>
       </div>
-      <p class="formula">Rendimiento CV = (métrica₁ + … + métricaₖ) / k</p>
-      <p class="small">Ejemplo del documento: N = 1000 observaciones y k = 5 → 5 bloques de 200.</p>
     </section>
 
-    <section class="slide" aria-label="Ejemplo educativo">
+    <section class="slide cv-anim compact technical-slide" aria-label="Fórmula del rendimiento K-Fold">
+      <span class="eyebrow">4 · Funcionamiento matemático y algorítmico</span>
+      <h2>De cinco iteraciones a <span class="accent">una métrica global</span></h2>
+      <p class="lead">Al completar las iteraciones, la métrica agregada (por ejemplo, el accuracy promedio) estima el rendimiento esperado sobre datos no observados.</p>
+      <div class="math" role="math" aria-label="Accuracy promedio igual a 1 sobre k por la sumatoria de Accuracy i, de i igual 1 a k"><span>Accuracy<sub>promedio</sub></span><span>=</span><span class="frac"><span>1</span><span><i>k</i></span></span><span class="sum"><span class="lim"><i>k</i></span><span class="big">∑</span><span class="lim"><i>i</i>=1</span></span><span>Accuracy<sub><i>i</i></sub></span><span>=</span><span class="frac"><span>Accuracy<sub>1</sub> + Accuracy<sub>2</sub> + … + Accuracy<sub><i>k</i></sub></span><span><i>k</i></span></span></div>
+      <p class="small">Con k = 5 el modelo completa exactamente 5 iteraciones y la sumatoria queda en el rango i ∈ [1, 5]:</p>
+      <div class="math" role="math" aria-label="Accuracy promedio igual a 1 sobre 5 por la sumatoria de Accuracy i, de i igual 1 a 5"><span>Accuracy<sub>promedio</sub></span><span>=</span><span class="frac"><span>1</span><span>5</span></span><span class="sum"><span class="lim">5</span><span class="big">∑</span><span class="lim"><i>i</i>=1</span></span><span>Accuracy<sub><i>i</i></sub></span><span>=</span><span class="frac"><span>Accuracy<sub>1</sub> + Accuracy<sub>2</sub> + … + Accuracy<sub>5</sub></span><span>5</span></span></div>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo educativo: planteamiento">
       <span class="eyebrow">4 · Ejemplo: predecir si un estudiante aprobará</span>
-      <h2>Del dato a una decisión educativa</h2>
+      <h2>Del dato a una <span class="accent">alerta temprana</span></h2>
       <div class="flow">
-        <div><strong class="accent">Datos</strong><br>asistencia, notas y entregas</div><span class="arrow">→</span>
+        <div><strong class="accent">Datos</strong><br>N = 100 estudiantes</div><span class="arrow">→</span>
         <div><strong class="accent">Modelo</strong><br>clasifica aprobado / no aprobado</div><span class="arrow">→</span>
-        <div><strong class="magenta">Validación</strong><br>estima alertas tempranas reales</div>
+        <div><strong class="magenta">Validación</strong><br>K-Fold estándar, k = 5</div>
       </div>
-      <p class="lead">Con pocos datos, un hold-out puede depender demasiado de qué estudiantes cayeron en test. K-Fold reduce esa dependencia.</p>
-    </section>
-
-    <section class="slide compact" aria-label="Ejemplo práctico interactivo">
-      <span class="eyebrow">Ejemplo práctico interactivo</span>
-      <h2>Probemos distintos valores de <span class="accent">k</span></h2>
-      <p class="lead">Hay 10 observaciones de estudiantes. Elegí cuántos folds usar y observá qué grupo queda como test en cada vuelta.</p>
-      <div class="interactive">
-        <div class="interactive-controls">
-          <label for="fold-range"><strong>Folds:</strong> <output id="fold-value">5</output></label>
-          <input id="fold-range" type="range" min="2" max="10" value="5" step="1">
-          <button id="next-fold" type="button">Cambiar vuelta</button>
-        </div>
-        <div id="demo-folds" class="demo-folds" aria-label="Distribución interactiva de observaciones"></div>
-        <p id="demo-status" class="small"></p>
-        <p class="formula">Accuracy promedio: <span id="demo-score">—</span></p>
-      </div>
-      <p class="small">La métrica es ilustrativa: la interacción muestra la lógica de particionar, entrenar, evaluar y promediar.</p>
-    </section>
-
-    <section class="slide compact" aria-label="Ejemplo interactivo de métricas">
-      <span class="eyebrow">Ejemplo práctico · Métricas</span>
-      <h2>¿Qué cambia cuando ajustamos el umbral?</h2>
-      <p class="lead">En una alerta temprana, mover el umbral cambia el equilibrio entre detectar estudiantes en riesgo y generar falsas alarmas.</p>
-      <div class="interactive">
-        <div class="interactive-controls">
-          <label for="threshold-range"><strong>Umbral:</strong> <output id="threshold-value">0,50</output></label>
-          <input id="threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
-        </div>
-        <table class="confusion-table">
-          <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
-          <tbody>
-            <tr><th>Real: riesgo</th><td id="tp-cell">TP: —</td><td id="fn-cell">FN: —</td></tr>
-            <tr><th>Real: no riesgo</th><td id="fp-cell">FP: —</td><td id="tn-cell">TN: —</td></tr>
-          </tbody>
-        </table>
-        <p id="metrics-status" class="small"></p>
-        <p class="formula">Precision: <span id="precision-value">—</span> · Recall: <span id="recall-value">—</span> · F1: <span id="f1-value">—</span></p>
-      </div>
-      <p class="small">La matriz es ilustrativa: sirve para interpretar métricas, no para evaluar un modelo real.</p>
-    </section>
-
-    <section class="slide compact" aria-label="Tipos y estrategias">
-      <span class="eyebrow">5 · Tipos y estrategias de validación cruzada</span>
-      <h2>No todos los datos se validan igual</h2>
-      <div class="grid three">
-        <article class="card"><h3 class="accent">Hold-out</h3><p>Una división 80/20 o 70/30. Rápida, pero sensible al corte.</p></article>
-        <article class="card"><h3 class="accent">K-Fold</h3><p>Uso general. Habitualmente k = 5 o 10.</p></article>
-        <article class="card"><h3 class="accent">Stratified K-Fold</h3><p>Conserva la proporción de clases. Ideal para clasificación desbalanceada.</p></article>
-        <article class="card"><h3 class="accent">TimeSeriesSplit</h3><p>Respeta el orden temporal. Nunca entrena con el futuro.</p></article>
-        <article class="card"><h3 class="accent">GroupKFold</h3><p>Mantiene juntos grupos relacionados para evitar contaminación.</p></article>
-        <article class="card"><h3 class="accent">LOO / LPO</h3><p>Deja una o p observaciones afuera. Poco sesgo, alto costo.</p></article>
-      </div>
-    </section>
-
-    <section class="slide" aria-label="Métricas">
-      <span class="eyebrow">6 · Métricas de evaluación</span>
-      <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
+      <p class="lead">En Educational Data Mining, anticipar la condición final permite tutorías y alertas tempranas.</p>
       <div class="grid">
-        <article class="card"><h3>Accuracy</h3><p>Proporción total de predicciones correctas.</p></article>
-        <article class="card"><h3>Precision · Recall</h3><p>Importantes cuando los falsos positivos y negativos tienen costos diferentes.</p></article>
-        <article class="card"><h3>F1-score</h3><p>Media armónica entre Precision y Recall.</p></article>
-        <article class="card"><h3>ROC-AUC · Confusión</h3><p>Capacidad discriminativa y detalle de tipos de error.</p></article>
+        <article class="card bad"><h3>Hold-out</h3><p>Con pocos datos hay alto riesgo de sesgo muestral: la métrica depende de qué estudiantes quedaron en prueba.</p></article>
+        <article class="card good"><h3>K-Fold estándar</h3><p>5 pliegues de 20 estudiantes: cada iteración entrena con 80 y prueba con 20.</p></article>
       </div>
-      <p class="formula">Reporte: media ± desviación estándar</p>
-      <p class="small">Media alta + desviación baja suele ser una señal más confiable que una única métrica máxima.</p>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo educativo: resultados">
+      <span class="eyebrow">4 · Ejemplo: predecir si un estudiante aprobará</span>
+      <h2>Resultados por pliegue: <span class="accent">90%</span> promedio</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Accuracy cuando cada pliegue fue prueba</h3>
+          <div class="bars">
+            <div class="bar-row" data-acc="88" data-fold="1" role="button" tabindex="0"><span>Pliegue 1</span><i style="width:88%"></i><b>88%</b></div>
+            <div class="bar-row" data-acc="92" data-fold="2" role="button" tabindex="0"><span>Pliegue 2</span><i style="width:92%"></i><b>92%</b></div>
+            <div class="bar-row" data-acc="90" data-fold="3" role="button" tabindex="0"><span>Pliegue 3</span><i style="width:90%"></i><b>90%</b></div>
+            <div class="bar-row" data-acc="91" data-fold="4" role="button" tabindex="0"><span>Pliegue 4</span><i style="width:91%"></i><b>91%</b></div>
+            <div class="bar-row" data-acc="89" data-fold="5" role="button" tabindex="0"><span>Pliegue 5</span><i style="width:89%"></i><b>89%</b></div>
+          </div>
+          <p class="small">Hacé clic en un pliegue: ¿qué dirías si fuera tu único conjunto de prueba?</p>
+          <p id="holdout-msg" class="bias-summary">Elegí un pliegue para comparar con el promedio de K-Fold.</p>
+        </div>
+        <div class="card">
+          <h3>Aplicación de la fórmula</h3>
+          <p class="formula">(88 + 92 + 90 + 91 + 89) / 5 = 450 / 5 = 90%</p>
+          <p>El promedio de 90% y la dispersión reducida indican un modelo consistente: su capacidad predictiva no depende de anomalías en grupos pequeños.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TEMA 5 · Otros tipos y estrategias de validación cruzada ===== -->
+    <section class="slide cv-anim compact technical-slide" aria-label="Métodos exhaustivos y no exhaustivos">
+      <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
+      <h2>Exhaustivos y no exhaustivos</h2>
+      <p class="lead">Todos estiman qué tan bien generalizará un modelo a datos nuevos, entrenando y evaluando sobre distintas particiones.</p>
+      <div class="grid three">
+        <article class="card"><h3 class="accent">Leave-One-Out (LOO)</h3><p class="small magenta">Exhaustivo</p><p>Cada observación es prueba una vez; las n−1 restantes entrenan. Poco sesgo, pero n modelos y varianza alta. Útil en datasets pequeños.</p></article>
+        <article class="card"><h3 class="accent">Leave-P-Out (LPO)</h3><p class="small magenta">Exhaustivo</p><p>Deja p observaciones fuera. Genera C(n, p) combinaciones: casi nunca es viable.</p></article>
+        <article class="card"><h3 class="accent">Exhaustivo vs. no exhaustivo</h3><p>Los exhaustivos prueban todas las divisiones posibles; los no exhaustivos, solo un subconjunto elegido al azar o con una regla fija.</p></article>
+        <article class="card"><h3 class="accent">Hold-out</h3><p class="small magenta">No exhaustivo</p><p>Una sola división (80/20 o 70/30). Rápido y simple, pero depende de cómo cayó el corte.</p></article>
+        <article class="card"><h3 class="accent">Repeated K-Fold</h3><p class="small magenta">No exhaustivo</p><p>Repite K-Fold con particiones aleatorias distintas: estimación más estable.</p></article>
+        <article class="card"><h3 class="accent">Monte Carlo (ShuffleSplit)</h3><p class="small magenta">No exhaustivo</p><p>Divisiones aleatorias train/test repetidas. A diferencia de K-Fold, los conjuntos de prueba pueden solaparse.</p></article>
+      </div>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Costo computacional de cada estrategia">
+      <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
+      <h2>¿Cuántos modelos hay que <span class="accent">entrenar</span>?</h2>
+      <p class="lead">Cada estrategia entrena una cantidad distinta de modelos. Mové n (observaciones) y p (las que LPO deja afuera).</p>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="cost-n"><strong>n:</strong> <output id="cost-n-val">100</output></label>
+          <input id="cost-n" type="range" min="10" max="200" value="100" step="10" aria-label="Cantidad de observaciones n">
+          <label for="cost-p"><strong>p:</strong> <output id="cost-p-val">2</output></label>
+          <input id="cost-p" type="range" min="1" max="5" value="2" step="1" aria-label="Observaciones p que deja afuera LPO">
+        </div>
+        <div class="bars cost">
+          <div class="bar-row"><span>Hold-out</span><i id="cost-bar-ho"></i><b id="cost-val-ho"></b></div>
+          <div class="bar-row"><span>K-Fold · k = 5</span><i id="cost-bar-k5"></i><b id="cost-val-k5"></b></div>
+          <div class="bar-row"><span>K-Fold · k = 10</span><i id="cost-bar-k10"></i><b id="cost-val-k10"></b></div>
+          <div class="bar-row"><span id="cost-loo-label">LOO</span><i id="cost-bar-loo"></i><b id="cost-val-loo"></b></div>
+          <div class="bar-row"><span id="cost-lpo-label">LPO</span><i id="cost-bar-lpo"></i><b id="cost-val-lpo"></b></div>
+        </div>
+        <p id="cost-note" class="small"></p>
+      </div>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Métodos según la estructura de los datos">
+      <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
+      <h2>Según la <span class="accent">estructura de los datos</span></h2>
+      <div class="grid">
+        <article class="card"><h3 class="accent">Stratified K-Fold</h3><p>Mantiene la proporción de clases en cada pliegue. Recomendable para clasificación con clases desbalanceadas.</p></article>
+        <article class="card"><h3 class="accent">Group K-Fold</h3><p>Todas las muestras de un mismo grupo (paciente, usuario, sensor) quedan juntas, en entrenamiento o en prueba. Evita data leakage entre muestras correlacionadas.</p></article>
+        <article class="card"><h3 class="accent">Stratified Group K-Fold</h3><p>Combina ambos criterios: respeta los grupos y la proporción de clases.</p></article>
+        <article class="card"><h3 class="accent">Leave-One-Group-Out / Leave-P-Groups-Out</h3><p>Es LOO o LPO aplicado a grupos completos en lugar de observaciones individuales.</p></article>
+      </div>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Estratificado vs aleatorio">
+      <span class="eyebrow">5 · Según la estructura de los datos</span>
+      <h2>Aleatorio vs. <span class="accent">estratificado</span></h2>
+      <p class="lead">25 estudiantes, 5 en riesgo (clase minoritaria). Se reparten en 5 folds de 5.</p>
+      <div class="interactive">
+        <div class="cv-controls">
+          <button class="cv-opt active" data-cv-strat="random" type="button">K-Fold aleatorio</button>
+          <button class="cv-opt" data-cv-strat="strat" type="button">Stratified K-Fold</button>
+          <button id="strat-shuffle" type="button">Mezclar de nuevo</button>
+        </div>
+        <div id="strat-folds" class="strat-folds"></div>
+        <p id="strat-msg" class="bias-summary"></p>
+      </div>
+      <p class="small">Rojo = en riesgo · Blanco = aprobó.</p>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Time Series Split">
+      <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
+      <h2>Time Series Split: <span class="accent">pasado → futuro</span></h2>
+      <p class="lead">Walk-forward, rolling o expanding window: se entrena con el pasado y se valida con el futuro.</p>
+      <div class="interactive">
+        <div id="ts-rows" class="kf" aria-label="Ventana expansiva de TimeSeriesSplit">
+          <div class="kf-row"><b>Split 1</b><span class="c tr">T1</span><span class="c te">T2</span><span class="c un">T3</span><span class="c un">T4</span><span class="c un">T5</span></div>
+          <div class="kf-row"><b>Split 2</b><span class="c tr">T1</span><span class="c tr">T2</span><span class="c te">T3</span><span class="c un">T4</span><span class="c un">T5</span></div>
+          <div class="kf-row"><b>Split 3</b><span class="c tr">T1</span><span class="c tr">T2</span><span class="c tr">T3</span><span class="c te">T4</span><span class="c un">T5</span></div>
+          <div class="kf-row"><b>Split 4</b><span class="c tr">T1</span><span class="c tr">T2</span><span class="c tr">T3</span><span class="c tr">T4</span><span class="c te">T5</span></div>
+        </div>
+        <div class="cv-controls"><button id="ts-next" type="button">Siguiente split ▶</button><span id="ts-text" class="small"></span></div>
+        <p class="small">Blanco: entrenamiento · Rojo: prueba · Punteado: aún no usado.</p>
+      </div>
+      <article class="card bad"><h3>Nunca mezclar aleatoriamente una serie temporal</h3><p>Se filtraría información del futuro hacia el entrenamiento.</p></article>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Validación anidada y buenas prácticas">
+      <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
+      <h2>Validación anidada y <span class="accent">buenas prácticas</span></h2>
+      <div class="grid">
+        <article class="card"><h3 class="accent">Nested CV · bucle interno</h3><p>Selecciona hiperparámetros, por ejemplo con GridSearch.</p></article>
+        <article class="card"><h3 class="accent">Nested CV · bucle externo</h3><p>Estima el rendimiento real del modelo, con un error menos optimista y sin sobreajustar al conjunto de validación.</p></article>
+        <article class="card good" style="grid-column: 1 / -1">
+          <h3>Buenas prácticas</h3>
+          <ul>
+            <li>Preprocesar (escalado, imputación, selección de variables) <strong>dentro de cada pliegue</strong>, por ejemplo con un Pipeline de scikit-learn.</li>
+            <li>Reportar la media y la desviación estándar entre pliegues.</li>
+            <li>Reservar un conjunto de prueba final que no se toque durante la validación cruzada.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== TEMA 6 · Métricas de evaluación en validación cruzada ===== -->
+    <section class="slide cv-anim compact technical-slide" aria-label="Métricas por fold">
+      <span class="eyebrow">6 · Métricas de evaluación en validación cruzada</span>
+      <h2>Una métrica por fold, luego <span class="accent">media y dispersión</span></h2>
+      <div class="grid">
+        <article class="card"><h3>Accuracy</h3><p>Proporción de aciertos globales sobre el total de predicciones.</p></article>
+        <article class="card"><h3>Precision</h3><p>Calidad de las predicciones positivas: VP / (VP + FP).</p></article>
+        <article class="card"><h3>Recall (sensibilidad)</h3><p>Cobertura de la clase real positiva: VP / (VP + FN).</p></article>
+        <article class="card"><h3>Matriz de confusión</h3><p>Aciertos y tipos de error (Tipo I y Tipo II) de forma desagregada.</p></article>
+      </div>
+      <p class="formula">Reporte: media ± desviación estándar entre folds</p>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Media y dispersión entre folds">
+      <span class="eyebrow">6 · Métricas de evaluación en validación cruzada</span>
+      <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
+      <div class="interactive">
+        <div class="cv-controls">
+          <button class="cv-opt active" data-cv-model="A" type="button">Modelo A</button>
+          <button class="cv-opt" data-cv-model="B" type="button">Modelo B</button>
+          <span class="small">Mismo accuracy promedio, distinta estabilidad.</span>
+        </div>
+        <div id="md-bars" class="bars"></div>
+        <p id="md-report" class="formula"></p>
+        <p id="md-msg" class="bias-summary"></p>
+      </div>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Matriz de confusión del ejemplo">
+      <span class="eyebrow">6 · Ejemplo: matriz de confusión</span>
+      <h2>El positivo es <span class="magenta">no aprobado</span></h2>
+      <p class="lead">Queremos detectar a quienes están en riesgo. Es una elección: puede definirse al revés, pero cambian los números. De 100 estudiantes, 10 no aprobaron; el modelo marca a 8.</p>
+      <table class="confusion-table">
+        <thead><tr><th></th><th>Predice «no aprueba»</th><th>Predice «aprueba»</th></tr></thead>
+        <tbody>
+          <tr><th>Real: no aprobó</th><td><strong class="accent">VP = 6</strong><br>acertó la alerta</td><td><strong class="magenta">FN = 4</strong><br>estudiante en riesgo que pasó desapercibido</td></tr>
+          <tr><th>Real: aprobó</th><td><strong class="magenta">FP = 2</strong><br>falsa alarma</td><td><strong class="accent">VN = 88</strong><br>acertó que aprobaba</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Accuracy, precision y recall del ejemplo">
+      <span class="eyebrow">6 · Ejemplo: accuracy, precision y recall</span>
+      <h2 id="ex-title">El 94% de accuracy <span class="magenta">tapa</span> algo</h2>
+      <div class="cv-controls">
+        <button class="cv-opt active" data-cv-case="real" type="button">Modelo del ejemplo</button>
+        <button class="cv-opt" data-cv-case="naive" type="button">Modelo ingenuo: «aprueba» a todos</button>
+      </div>
+      <div class="grid three">
+        <article class="card bad"><h3>Accuracy</h3><p class="formula" id="ex-acc-f"></p><p id="ex-acc-t"></p></article>
+        <article class="card"><h3>Precision</h3><p class="formula" id="ex-pre-f"></p><p id="ex-pre-t"></p></article>
+        <article class="card"><h3>Recall</h3><p class="formula" id="ex-rec-f"></p><p id="ex-rec-t"></p></article>
+      </div>
+      <p id="ex-sum" class="bias-summary"></p>
+    </section>
+
+    <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo interactivo de métricas">
+      <span class="eyebrow">6 · Ejemplo práctico · Métricas</span>
+      <h2>Si alerta a más estudiantes, <span class="accent">sube el recall</span> y baja la precisión</h2>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="threshold-range"><strong>Umbral de alerta:</strong> <output id="threshold-value">medio</output></label>
+          <input id="threshold-range" type="range" min="1" max="3" value="2" step="1" aria-label="Umbral de alerta: alto, medio o bajo">
+        </div>
+        <div class="cv-split">
+          <table class="confusion-table">
+            <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
+            <tbody>
+              <tr><th>Real: no aprobó</th><td id="tp-cell">VP: —</td><td id="fn-cell">FN: —</td></tr>
+              <tr><th>Real: aprobó</th><td id="fp-cell">FP: —</td><td id="tn-cell">VN: —</td></tr>
+            </tbody>
+          </table>
+          <div>
+            <div id="dots" class="dots" aria-label="Los 100 estudiantes según el resultado de la alerta"></div>
+            <p class="small">Rojo sólido: VP · Aro rojo: FN · Blanco: FP · Gris: VN</p>
+          </div>
+        </div>
+        <p id="metrics-status" class="small"></p>
+        <p class="formula">Accuracy: <span id="accuracy-value">—</span> · Precision: <span id="precision-value">—</span> · Recall: <span id="recall-value">—</span> · F1: <span id="f1-value">—</span></p>
+      </div>
+      <p class="small">El umbral medio es el caso del ejemplo; los otros dos son escenarios ilustrativos sobre los mismos 100 estudiantes.</p>
     </section>
 
     <section class="slide compact technical-slide" aria-label="Scikit-Learn">
@@ -710,86 +919,183 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
       });
       render();
 
-      const range = document.querySelector("#fold-range");
-      const foldValue = document.querySelector("#fold-value");
-      const demoFolds = document.querySelector("#demo-folds");
-      const demoStatus = document.querySelector("#demo-status");
-      const demoScore = document.querySelector("#demo-score");
-      const nextFold = document.querySelector("#next-fold");
-      let demoRound = 0;
+      // ===== Interacciones de los temas 4, 5 y 6 =====
+      const $ = (id) => document.getElementById(id);
+      const setText = (id, text) => { const el = $(id); if (el) el.textContent = text; };
+      const fmt = (n) => n.toLocaleString("es-AR");
+      const pct = (x) => `${Math.round(x * 100)}%`;
+      const dec = (x) => x.toFixed(1).replace(".", ",");
+      const onScreen = (el) => !!el.closest(".slide")?.classList.contains("active");
+      const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+      const bindOpts = (selector, key, onPick) => {
+        const btns = [...document.querySelectorAll(selector)];
+        btns.forEach((b) => b.addEventListener("click", () => { btns.forEach((x) => x.classList.toggle("active", x === b)); onPick(b.dataset[key]); }));
+      };
+      document.querySelectorAll(".cv-anim input[type=range]").forEach((el) => el.addEventListener("keydown", (e) => e.stopPropagation()));
 
-      if (range) {
-        function renderDemo() {
-          const folds = Number(range.value);
-          const perFold = Math.ceil(10 / folds);
-          const testStart = (demoRound % folds) * perFold;
-          const testEnd = Math.min(testStart + perFold, 10);
-          const score = 0.78 + ((demoRound + folds) % 4) * 0.04;
-          if (foldValue) foldValue.value = folds;
-          if (demoFolds) {
-            demoFolds.innerHTML = "";
-            for (let index = 0; index < 10; index += 1) {
-              const item = document.createElement("div");
-              const isTest = index >= testStart && index < testEnd;
-              item.className = `demo-fold ${isTest ? "test" : "train"}`;
-              item.textContent = index + 1;
-              item.title = isTest ? "Test en esta vuelta" : "Entrenamiento en esta vuelta";
-              demoFolds.appendChild(item);
-            }
-          }
-          if (demoStatus) demoStatus.textContent = `Vuelta ${(demoRound % folds) + 1} de ${folds}: ${testEnd - testStart} observaciones en test y ${10 - (testEnd - testStart)} en entrenamiento.`;
-          if (demoScore) demoScore.textContent = `${Math.round(score * 100)}%`;
-        }
-
-        range.addEventListener("input", () => {
-          demoRound = 0;
-          renderDemo();
-
-          const threshold = document.querySelector("#threshold-range");
-          const thresholdValue = document.querySelector("#threshold-value");
-          const metricsStatus = document.querySelector("#metrics-status");
-          const metricElements = {
-            tp: document.querySelector("#tp-cell"),
-            fn: document.querySelector("#fn-cell"),
-            fp: document.querySelector("#fp-cell"),
-            tn: document.querySelector("#tn-cell"),
-            precision: document.querySelector("#precision-value"),
-            recall: document.querySelector("#recall-value"),
-            f1: document.querySelector("#f1-value")
-          };
-
-          if (threshold) {
-            function renderMetrics() {
-              const value = Number(threshold.value);
-              const tp = value <= .5 ? 8 : 6;
-              const fn = 10 - tp;
-              const fp = value <= .5 ? 4 : 2;
-              const tn = 8 - fp;
-              const precision = tp / (tp + fp);
-              const recall = tp / (tp + fn);
-              const f1 = (2 * precision * recall) / (precision + recall);
-              if (thresholdValue) thresholdValue.value = value.toFixed(2).replace(".", ",");
-              if (metricElements.tp) metricElements.tp.textContent = `TP: ${tp}`;
-              if (metricElements.fn) metricElements.fn.textContent = `FN: ${fn}`;
-              if (metricElements.fp) metricElements.fp.textContent = `FP: ${fp}`;
-              if (metricElements.tn) metricElements.tn.textContent = `TN: ${tn}`;
-              if (metricElements.precision) metricElements.precision.textContent = `${Math.round(precision * 100)}%`;
-              if (metricElements.recall) metricElements.recall.textContent = `${Math.round(recall * 100)}%`;
-              if (metricElements.f1) metricElements.f1.textContent = `${Math.round(f1 * 100)}%`;
-              if (metricsStatus) metricsStatus.textContent = value <= .5
-                ? "Umbral bajo: detecta más casos de riesgo, pero aumenta las falsas alarmas."
-                : "Umbral alto: reduce falsas alarmas, pero puede dejar pasar más casos de riesgo.";
-            }
-
-            threshold.addEventListener("input", renderMetrics);
-            renderMetrics();
-          }
+      // 1) K-Fold: reproductor de iteraciones (N = 1000)
+      const kfBar = $("kf-bar");
+      if (kfBar) {
+        const ks = [2, 4, 5, 8, 10];
+        const kSel = $("kf-k");
+        const auto = $("kf-auto");
+        let it = 0, timer = null;
+        const draw = () => {
+          const k = ks[Number(kSel.value)], size = 1000 / k;
+          it %= k;
+          kfBar.style.gridTemplateColumns = `repeat(${k}, minmax(0, 1fr))`;
+          kfBar.innerHTML = Array.from({ length: k }, (_, i) => `<span class="c ${i === it ? "te" : "tr"}">F${i + 1}</span>`).join("");
+          setText("kf-k-val", k);
+          setText("kf-text", `Iteración ${it + 1} de ${k}: prueba con el Fold ${it + 1} (${size} obs.) y entrena con los otros ${k - 1} folds (${1000 - size} obs.).`);
+        };
+        kSel.addEventListener("input", () => { it = 0; draw(); });
+        $("kf-next").addEventListener("click", () => { it += 1; draw(); });
+        auto.addEventListener("click", () => {
+          if (timer) { clearInterval(timer); timer = null; auto.textContent = "▶ Reproducir"; return; }
+          auto.textContent = "⏸ Pausar";
+          timer = setInterval(() => { if (onScreen(kfBar)) { it += 1; draw(); } }, 1100);
         });
-      nextFold?.addEventListener("click", () => {
-        demoRound += 1;
-        renderDemo();
+        draw();
+      }
+
+      // 2) Ejemplo del estudiante: ¿qué diría un hold-out?
+      const accRows = [...document.querySelectorAll("[data-acc]")];
+      accRows.forEach((row) => {
+        const pick = () => {
+          accRows.forEach((r) => r.classList.toggle("sel", r === row));
+          const acc = Number(row.dataset.acc), d = acc - 90, a = Math.abs(d);
+          setText("holdout-msg", `Si el Pliegue ${row.dataset.fold} fuera tu único conjunto de prueba (hold-out), dirías ${acc}%` + (d ? `: ${a} punto${a > 1 ? "s" : ""} ${d > 0 ? "por encima" : "por debajo"} del promedio real (90%).` : ", justo el promedio real."));
+        };
+        row.addEventListener("click", pick);
+        row.addEventListener("keydown", (e) => { if (e.key === "Enter") pick(); });
       });
-      if (range) renderDemo();
+
+      // 3) Costo: cantidad de modelos a entrenar
+      const nR = $("cost-n");
+      if (nR) {
+        const pR = $("cost-p");
+        const comb = (n, p) => { let r = 1; for (let i = 1; i <= p; i++) r = (r * (n - p + i)) / i; return Math.round(r); };
+        const drawCost = () => {
+          const n = Number(nR.value), p = Number(pR.value);
+          const vals = { ho: 1, k5: 5, k10: 10, loo: n, lpo: comb(n, p) };
+          const max = Math.max(...Object.values(vals));
+          setText("cost-n-val", n);
+          setText("cost-p-val", p);
+          setText("cost-lpo-label", `LPO · C(${n}, ${p})`);
+          setText("cost-loo-label", `LOO · n = ${n}`);
+          Object.entries(vals).forEach(([key, v]) => {
+            const bar = $(`cost-bar-${key}`);
+            if (bar) bar.style.width = `${Math.max(2, (Math.log10(v + 1) / Math.log10(max + 1)) * 100)}%`;
+            setText(`cost-val-${key}`, fmt(v));
+          });
+          setText("cost-note", vals.lpo > 10000 ? `LPO exige entrenar ${fmt(vals.lpo)} modelos: casi nunca es viable. (Barras en escala logarítmica.)` : "Con pocos datos, LPO todavía es posible. Aumentá n o p. (Barras en escala logarítmica.)");
+        };
+        nR.addEventListener("input", drawCost);
+        pR.addEventListener("input", drawCost);
+        drawCost();
+      }
+
+      // 4) Aleatorio vs. estratificado
+      const stBox = $("strat-folds");
+      if (stBox) {
+        let mode = "random";
+        const drawStrat = () => {
+          let folds = Array.from({ length: 5 }, () => []);
+          if (mode === "random") {
+            shuffle(Array.from({ length: 25 }, (_, i) => i < 5)).forEach((v, i) => folds[Math.floor(i / 5)].push(v));
+          } else {
+            for (let i = 0; i < 5; i++) folds[i].push(true);
+            for (let i = 0; i < 20; i++) folds[Math.floor(i / 4)].push(false);
+            folds.forEach(shuffle);
+          }
+          stBox.innerHTML = folds.map((f, i) => {
+            const r = f.filter(Boolean).length;
+            return `<div class="strat-col${r === 0 ? " warn" : ""}"><b>Fold ${i + 1}</b><div class="strat-dots">${f.map((v) => `<span class="dot ${v ? "risk" : "ok"}"></span>`).join("")}</div><small>${r} de 5 en riesgo</small></div>`;
+          }).join("");
+          const zero = folds.some((f) => !f.some(Boolean));
+          setText("strat-msg", mode === "random"
+            ? (zero ? "¡Un fold quedó sin ningún estudiante en riesgo! Su métrica no dice nada sobre el caso que más importa." : "Al azar, la cantidad de estudiantes en riesgo cambia de un fold a otro. Mezclá de nuevo: a veces un fold se queda sin ninguno.")
+            : "Cada fold conserva la proporción de clases del dataset: 1 de 5 en riesgo (20%) en todos.");
+        };
+        bindOpts("[data-cv-strat]", "cvStrat", (m) => { mode = m; drawStrat(); });
+        $("strat-shuffle").addEventListener("click", drawStrat);
+        drawStrat();
+      }
+
+      // 5) Time Series Split: un split por vez
+      const tsRows = [...document.querySelectorAll("#ts-rows .kf-row")];
+      if (tsRows.length) {
+        let cur = 0;
+        const drawTs = () => {
+          tsRows.forEach((r, i) => r.classList.toggle("dim", i !== cur));
+          setText("ts-text", `Split ${cur + 1}: entrena con T1${cur ? "…T" + (cur + 1) : ""} (el pasado) y prueba con T${cur + 2} (el futuro).`);
+        };
+        $("ts-next").addEventListener("click", () => { cur = (cur + 1) % tsRows.length; drawTs(); });
+        drawTs();
+      }
+
+      // 6) Media igual, dispersión distinta
+      const mdBars = $("md-bars");
+      if (mdBars) {
+        const models = { A: [90, 89, 91, 90, 90], B: [99, 78, 95, 84, 94] };
+        mdBars.innerHTML = [1, 2, 3, 4, 5].map((n) => `<div class="bar-row"><span>Fold ${n}</span><i id="md-bar-${n}"></i><b id="md-val-${n}"></b></div>`).join("");
+        const drawMd = (key) => {
+          const v = models[key];
+          const mean = v.reduce((a, b) => a + b, 0) / v.length;
+          const sd = Math.sqrt(v.reduce((a, b) => a + (b - mean) ** 2, 0) / v.length);
+          v.forEach((x, i) => { $(`md-bar-${i + 1}`).style.width = `${x}%`; setText(`md-val-${i + 1}`, `${x}%`); });
+          setText("md-report", `Reporte: ${Math.round(mean)}% ± ${dec(sd)}`);
+          setText("md-msg", sd < 2
+            ? `Media ${Math.round(mean)}% y σ ≈ ${dec(sd)}: resultados consistentes entre folds.`
+            : `También ${Math.round(mean)}% de media, pero σ ≈ ${dec(sd)}: depende mucho de qué datos quedaron en prueba. Es menos confiable.`);
+        };
+        bindOpts("[data-cv-model]", "cvModel", drawMd);
+        drawMd("A");
+      }
+
+      // 7) Accuracy: modelo real vs. modelo ingenuo
+      if ($("ex-acc-f")) {
+        const cases = {
+          real: { title: "El 94% de accuracy tapa algo", af: "(6 + 88) / 100 = 94%", at: "Engaña con clases desbalanceadas: un modelo que dijera «aprueba» para todos tendría 90% sin detectar a nadie en riesgo.", pf: "6 / (6 + 2) = 75%", pt: "Cuando dice «no aprueba», acierta 3 de cada 4 veces. Importa si una falsa alarma sale cara (tutorías o recursos limitados).", rf: "6 / (6 + 4) = 60%", rt: "Detecta a 6 de los 10 que no aprobaron. Importa si lo grave es que nadie ayude a tiempo a un estudiante en riesgo.", sum: "Cuando el modelo alerta suele acertar (75%), pero deja sin detectar a 4 de cada 10 estudiantes en riesgo (recall 60%)." },
+          naive: { title: "90% de accuracy… sin detectar a nadie", af: "(0 + 90) / 100 = 90%", at: "Casi igual de «bueno» que el modelo real, pero solo porque hay muchos más aprobados.", pf: "0 / (0 + 0) = indefinida", pt: "Nunca emite una alerta: no hay predicciones positivas que evaluar.", rf: "0 / (0 + 10) = 0%", rt: "No detecta a ninguno de los 10 estudiantes en riesgo.", sum: "El accuracy casi no cambió, pero el recall se desplomó a 0%: por eso hay que mirar precision y recall." }
+        };
+        const drawEx = (key) => {
+          const c = cases[key];
+          setText("ex-title", c.title); setText("ex-acc-f", c.af); setText("ex-acc-t", c.at);
+          setText("ex-pre-f", c.pf); setText("ex-pre-t", c.pt); setText("ex-rec-f", c.rf); setText("ex-rec-t", c.rt); setText("ex-sum", c.sum);
+        };
+        bindOpts("[data-cv-case]", "cvCase", drawEx);
+        drawEx("real");
+      }
+
+      // 8) Umbral de alerta (con 100 estudiantes en pantalla)
+      const thr = document.querySelector("#threshold-range");
+      if (thr) {
+        const scenarios = {
+          1: { label: "alto", tp: 4, fp: 1, fn: 6, tn: 89, msg: "Umbral alto: alerta a pocos estudiantes. Casi no hay falsas alarmas, pero se escapan 6 de los 10 que no aprobaron." },
+          2: { label: "medio", tp: 6, fp: 2, fn: 4, tn: 88, msg: "Umbral medio (ejemplo del documento): acierta 3 de cada 4 alertas y detecta a 6 de los 10 en riesgo." },
+          3: { label: "bajo", tp: 8, fp: 6, fn: 2, tn: 84, msg: "Umbral bajo: detecta a 8 de los 10 en riesgo, pero aumentan las falsas alarmas y baja la precisión." }
+        };
+        const dots = $("dots");
+        function renderMetrics() {
+          const s = scenarios[thr.value] || scenarios[2];
+          const precision = s.tp / (s.tp + s.fp);
+          const recall = s.tp / (s.tp + s.fn);
+          const f1 = (2 * precision * recall) / (precision + recall);
+          setText("threshold-value", s.label);
+          setText("tp-cell", `VP: ${s.tp}`); setText("fn-cell", `FN: ${s.fn}`);
+          setText("fp-cell", `FP: ${s.fp}`); setText("tn-cell", `VN: ${s.tn}`);
+          setText("accuracy-value", pct((s.tp + s.tn) / 100));
+          setText("precision-value", pct(precision)); setText("recall-value", pct(recall)); setText("f1-value", pct(f1));
+          setText("metrics-status", s.msg);
+          if (dots) {
+            if (dots.children.length !== 100) dots.innerHTML = '<span class="dot"></span>'.repeat(100);
+            const cls = [...Array(s.tp).fill("vp"), ...Array(s.fn).fill("fn"), ...Array(s.fp).fill("fp"), ...Array(s.tn).fill("vn")];
+            [...dots.children].forEach((d, i) => { d.className = `dot ${cls[i]}`; });
+          }
+        }
+        thr.addEventListener("input", renderMetrics);
+        renderMetrics();
       }
 
       // Python runner (Pyodide) global
