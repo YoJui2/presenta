@@ -97,6 +97,31 @@
       font: inherit; font-weight: 700; cursor: pointer;
     }
     .interactive button:hover, .interactive button:focus-visible { background: var(--cyan); color: var(--navy); }
+    .interactive .py-select { min-height: 2.5rem; padding: .4rem .8rem; }
+    .interactive .py-select.active { background: var(--navy); border-color: var(--cyan); }
+    .interactive .py-select:not(.active) { background: rgba(27, 29, 34, .9); border-color: var(--line); }
+    .interactive .py-select:hover, .interactive .py-select:focus-visible {
+      background: #30343b; border-color: var(--cyan); color: var(--ink);
+    }
+    .interactive .py-select.active:hover, .interactive .py-select.active:focus-visible {
+      background: var(--navy); color: var(--ink);
+    }
+    .technical-layout {
+      display: grid; grid-template-columns: minmax(0, 2fr) minmax(16rem, .9fr);
+      align-items: start; gap: 1.2rem; width: 100%; max-width: 1450px;
+    }
+    .technical-demo { max-width: none; min-width: 0; }
+    .technical-demo textarea { display: block; min-height: 15rem !important; }
+    .technical-demo pre { max-width: none; }
+    .technical-info { grid-template-columns: 1fr; gap: .8rem; }
+    .technical-info .card { padding: 1rem 1.2rem; }
+    .technical-info .card p { margin-bottom: 0; }
+    .technical-layout.editor-expanded { grid-template-columns: minmax(0, 1fr); }
+    .technical-layout.editor-expanded .technical-demo textarea { min-height: 52vh !important; }
+    .slide.editor-expanded-slide {
+      height: 100vh; min-height: 0; justify-content: flex-start;
+      overflow-y: auto; padding-bottom: 6rem;
+    }
     .demo-folds { display: grid; grid-template-columns: repeat(10, minmax(2rem, 1fr)); gap: .35rem; margin: 1.2rem 0; }
     .demo-fold { min-height: 4rem; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: .4rem; border: 1px solid var(--line); font-weight: 800; }
     .demo-fold.train { background: rgba(103, 232, 249, .75); color: var(--navy); }
@@ -128,11 +153,15 @@
     .progress { height: .45rem; flex: 1; background: #3a3a3a; border-radius: 99px; overflow: hidden; }
     .progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--magenta)); transition: width .2s; }
     .controls { color: var(--muted); white-space: nowrap; }
+    .hidden { display: none; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     @media (max-width: 800px) {
       body { overflow: auto; }
       .slide { min-height: 100svh; padding-bottom: 5rem; }
       .grid, .grid.three { grid-template-columns: 1fr; }
+      .technical-layout { grid-template-columns: 1fr; }
+      .technical-info { grid-template-columns: 1fr; }
+      .slide.editor-expanded-slide { height: auto; min-height: 100svh; overflow: visible; }
       .flow { flex-direction: column; }
       .arrow { transform: rotate(90deg); }
       .folds { gap: .25rem; }
@@ -290,20 +319,45 @@
     <section class="slide compact" aria-label="Scikit-Learn">
       <span class="eyebrow">7 · Implementación técnica en Scikit-Learn</span>
       <h2>Una evaluación reproducible con Scikit-Learn</h2>
-      <pre><code>from sklearn.model_selection import cross_val_score
+      <div class="technical-layout">
+        <div class="interactive technical-demo">
+        <div class="interactive-controls" style="margin-bottom:.8rem; gap:.5rem;" role="group" aria-label="Seleccionar método de validación cruzada">
+          <button class="py-select active" type="button" data-target="code1" aria-controls="python-code" aria-pressed="true">cross_val_score</button>
+          <button class="py-select" type="button" data-target="code2" aria-controls="python-code" aria-pressed="false">cross_validate</button>
+          <button class="py-select" type="button" data-target="code3" aria-controls="python-code" aria-pressed="false">cross_val_predict</button>
+        </div>
+        <textarea id="python-code" spellcheck="false" style="width:100%; min-height: 10rem; padding:1rem; background:#050505; color:#fff; border:1px solid var(--line); border-left:5px solid var(--magenta); border-radius:.8rem; font:1.25rem/1.5 Consolas, 'Cascadia Code', monospace; resize: vertical;">from sklearn.model_selection import cross_val_score
 
-scores = cross_val_score(
-    modelo, X, y,
-    cv=5,
-    scoring="accuracy"
-)
+from sklearn.ensemble import RandomForestClassifier
 
-print(scores.mean())
-print(scores.std())</code></pre>
-      <div class="grid">
-        <div class="card"><h3 class="accent">cross_val_score()</h3><p>Una métrica, rápido y directo.</p></div>
-        <div class="card"><h3 class="accent">cross_validate()</h3><p>Varias métricas y tiempos de cómputo.</p></div>
-        <div class="card"><h3 class="accent">cross_val_predict()</h3><p>Predicciones out-of-fold para inspeccionar errores.</p></div>
+modelo = RandomForestClassifier(n_estimators=100, random_state=42)
+
+scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
+
+print("Accuracy promedio:", scores.mean())
+print("Desviación estándar:", scores.std())</textarea>
+        <div class="interactive-controls" style="margin-top:1rem;">
+          <button id="run-python" type="button">Ejecutar código</button>
+          <button id="reset-python" type="button">Restablecer</button>
+          <button id="expand-editor" type="button" aria-expanded="false" aria-controls="python-code">Ampliar editor</button>
+          <span id="py-status" class="small"></span>
+        </div>
+        <pre style="margin-top:1rem; min-height: 6rem;"><code id="python-output" style="white-space: pre-wrap;">Salida aparecerá aquí...</code></pre>
+      </div>
+        <div class="grid technical-info">
+          <div class="card">
+            <h3 class="accent">cross_val_score()</h3>
+            <p>Automatiza la validación cruzada y devuelve una métrica por fold. Permite estimar rápidamente el rendimiento sin particionar, entrenar y evaluar manualmente en cada iteración.</p>
+          </div>
+          <div class="card">
+            <h3 class="accent">cross_validate()</h3>
+            <p>Evalúa varias métricas a la vez, como accuracy, precision, recall y F1. Es útil cuando una sola medida no alcanza para describir el comportamiento del modelo.</p>
+          </div>
+          <div class="card">
+            <h3 class="accent">cross_val_predict()</h3>
+            <p>Genera predicciones out-of-fold para todas las observaciones: cada una proviene de un modelo que no la usó al entrenar. Así se pueden analizar errores, por ejemplo con una matriz de confusión.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -398,16 +452,16 @@ scores = cross_val_score(pipe, X, y, cv=5)</code></pre>
         render();
       }
       document.addEventListener("keydown", (event) => {
-        if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); goTo(current + 1); }
-        if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); goTo(current - 1); }
+        if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(event.key)) { event.preventDefault(); goTo(current + 1); }
+        if (["ArrowLeft", "ArrowUp", "PageUp"].includes(event.key)) { event.preventDefault(); goTo(current - 1); }
         if (event.key === "Home") goTo(0);
         if (event.key === "End") goTo(slides.length - 1);
         if (event.key.toLowerCase() === "f" && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
       });
       document.addEventListener("click", (event) => {
         if (!(event.target instanceof Element)) return;
-        if (event.target.closest(".footer, .interactive, button, input, label, select, textarea, a")) return;
-        goTo(current + (event.clientX > window.innerWidth / 2 ? 1 : -1));
+        if (event.target.closest(".footer, .interactive, button, input, label, select, textarea, a, .code-toggle")) return;
+        // Solo navegación por flechas (deshabilitado click lateral para avanzar/retroceder)
       });
       render();
 
@@ -419,73 +473,217 @@ scores = cross_val_score(pipe, X, y, cv=5)</code></pre>
       const nextFold = document.querySelector("#next-fold");
       let demoRound = 0;
 
-      function renderDemo() {
-        const folds = Number(range.value);
-        const perFold = Math.ceil(10 / folds);
-        const testStart = (demoRound % folds) * perFold;
-        const testEnd = Math.min(testStart + perFold, 10);
-        const score = 0.78 + ((demoRound + folds) % 4) * 0.04;
-        foldValue.value = folds;
-        demoFolds.innerHTML = "";
-        for (let index = 0; index < 10; index += 1) {
-          const item = document.createElement("div");
-          const isTest = index >= testStart && index < testEnd;
-          item.className = `demo-fold ${isTest ? "test" : "train"}`;
-          item.textContent = index + 1;
-          item.title = isTest ? "Test en esta vuelta" : "Entrenamiento en esta vuelta";
-          demoFolds.appendChild(item);
-        }
-        demoStatus.textContent = `Vuelta ${(demoRound % folds) + 1} de ${folds}: ${testEnd - testStart} observaciones en test y ${10 - (testEnd - testStart)} en entrenamiento.`;
-        demoScore.textContent = `${Math.round(score * 100)}%`;
-      }
-
-      range.addEventListener("input", () => {
-        demoRound = 0;
-        renderDemo();
-
-        const threshold = document.querySelector("#threshold-range");
-        const thresholdValue = document.querySelector("#threshold-value");
-        const metricsStatus = document.querySelector("#metrics-status");
-        const metricElements = {
-          tp: document.querySelector("#tp-cell"),
-          fn: document.querySelector("#fn-cell"),
-          fp: document.querySelector("#fp-cell"),
-          tn: document.querySelector("#tn-cell"),
-          precision: document.querySelector("#precision-value"),
-          recall: document.querySelector("#recall-value"),
-          f1: document.querySelector("#f1-value")
-        };
-
-        function renderMetrics() {
-          const value = Number(threshold.value);
-          const tp = value <= .5 ? 8 : 6;
-          const fn = 10 - tp;
-          const fp = value <= .5 ? 4 : 2;
-          const tn = 8 - fp;
-          const precision = tp / (tp + fp);
-          const recall = tp / (tp + fn);
-          const f1 = (2 * precision * recall) / (precision + recall);
-          thresholdValue.value = value.toFixed(2).replace(".", ",");
-          metricElements.tp.textContent = `TP: ${tp}`;
-          metricElements.fn.textContent = `FN: ${fn}`;
-          metricElements.fp.textContent = `FP: ${fp}`;
-          metricElements.tn.textContent = `TN: ${tn}`;
-          metricElements.precision.textContent = `${Math.round(precision * 100)}%`;
-          metricElements.recall.textContent = `${Math.round(recall * 100)}%`;
-          metricElements.f1.textContent = `${Math.round(f1 * 100)}%`;
-          metricsStatus.textContent = value <= .5
-            ? "Umbral bajo: detecta más casos de riesgo, pero aumenta las falsas alarmas."
-            : "Umbral alto: reduce falsas alarmas, pero puede dejar pasar más casos de riesgo.";
+      if (range) {
+        function renderDemo() {
+          const folds = Number(range.value);
+          const perFold = Math.ceil(10 / folds);
+          const testStart = (demoRound % folds) * perFold;
+          const testEnd = Math.min(testStart + perFold, 10);
+          const score = 0.78 + ((demoRound + folds) % 4) * 0.04;
+          if (foldValue) foldValue.value = folds;
+          if (demoFolds) {
+            demoFolds.innerHTML = "";
+            for (let index = 0; index < 10; index += 1) {
+              const item = document.createElement("div");
+              const isTest = index >= testStart && index < testEnd;
+              item.className = `demo-fold ${isTest ? "test" : "train"}`;
+              item.textContent = index + 1;
+              item.title = isTest ? "Test en esta vuelta" : "Entrenamiento en esta vuelta";
+              demoFolds.appendChild(item);
+            }
+          }
+          if (demoStatus) demoStatus.textContent = `Vuelta ${(demoRound % folds) + 1} de ${folds}: ${testEnd - testStart} observaciones en test y ${10 - (testEnd - testStart)} en entrenamiento.`;
+          if (demoScore) demoScore.textContent = `${Math.round(score * 100)}%`;
         }
 
-        threshold.addEventListener("input", renderMetrics);
-        renderMetrics();
-      });
-      nextFold.addEventListener("click", () => {
+        range.addEventListener("input", () => {
+          demoRound = 0;
+          renderDemo();
+
+          const threshold = document.querySelector("#threshold-range");
+          const thresholdValue = document.querySelector("#threshold-value");
+          const metricsStatus = document.querySelector("#metrics-status");
+          const metricElements = {
+            tp: document.querySelector("#tp-cell"),
+            fn: document.querySelector("#fn-cell"),
+            fp: document.querySelector("#fp-cell"),
+            tn: document.querySelector("#tn-cell"),
+            precision: document.querySelector("#precision-value"),
+            recall: document.querySelector("#recall-value"),
+            f1: document.querySelector("#f1-value")
+          };
+
+          if (threshold) {
+            function renderMetrics() {
+              const value = Number(threshold.value);
+              const tp = value <= .5 ? 8 : 6;
+              const fn = 10 - tp;
+              const fp = value <= .5 ? 4 : 2;
+              const tn = 8 - fp;
+              const precision = tp / (tp + fp);
+              const recall = tp / (tp + fn);
+              const f1 = (2 * precision * recall) / (precision + recall);
+              if (thresholdValue) thresholdValue.value = value.toFixed(2).replace(".", ",");
+              if (metricElements.tp) metricElements.tp.textContent = `TP: ${tp}`;
+              if (metricElements.fn) metricElements.fn.textContent = `FN: ${fn}`;
+              if (metricElements.fp) metricElements.fp.textContent = `FP: ${fp}`;
+              if (metricElements.tn) metricElements.tn.textContent = `TN: ${tn}`;
+              if (metricElements.precision) metricElements.precision.textContent = `${Math.round(precision * 100)}%`;
+              if (metricElements.recall) metricElements.recall.textContent = `${Math.round(recall * 100)}%`;
+              if (metricElements.f1) metricElements.f1.textContent = `${Math.round(f1 * 100)}%`;
+              if (metricsStatus) metricsStatus.textContent = value <= .5
+                ? "Umbral bajo: detecta más casos de riesgo, pero aumenta las falsas alarmas."
+                : "Umbral alto: reduce falsas alarmas, pero puede dejar pasar más casos de riesgo.";
+            }
+
+            threshold.addEventListener("input", renderMetrics);
+            renderMetrics();
+          }
+        });
+      nextFold?.addEventListener("click", () => {
         demoRound += 1;
         renderDemo();
       });
-      renderDemo();
+      if (range) renderDemo();
+      }
+
+      // Python runner (Pyodide) global
+      let pyodideReady = false;
+      let pyodideInstance = null;
+      async function ensurePyodide() {
+        if (pyodideReady && pyodideInstance) return pyodideInstance;
+        const pyStatusEl = document.getElementById("py-status");
+        if (pyStatusEl) pyStatusEl.textContent = "Cargando Python (Pyodide)...";
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+        document.body.appendChild(script);
+        await new Promise((res) => (script.onload = res));
+        pyodideInstance = await window.loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
+        await pyodideInstance.loadPackage(["scikit-learn", "numpy", "pandas"]);
+        pyodideReady = true;
+        if (pyStatusEl) pyStatusEl.textContent = "Listo para ejecutar";
+        return pyodideInstance;
+      }
+
+      // Runner for theme 7
+      const pyCode = document.getElementById("python-code");
+      const pyRun = document.getElementById("run-python");
+      const pyReset = document.getElementById("reset-python");
+      const pyOut = document.getElementById("python-output");
+      const pyStatus = document.getElementById("py-status");
+      const expandEditor = document.getElementById("expand-editor");
+      const technicalLayout = document.querySelector(".technical-layout");
+      if (pyStatus) pyStatus.textContent = "";
+      expandEditor?.addEventListener("click", () => {
+        const isExpanded = technicalLayout?.classList.toggle("editor-expanded") ?? false;
+        technicalLayout?.closest(".slide")?.classList.toggle("editor-expanded-slide", isExpanded);
+        expandEditor.setAttribute("aria-expanded", String(isExpanded));
+        expandEditor.textContent = isExpanded ? "Reducir editor" : "Ampliar editor";
+      });
+
+      function setupPythonRunner() {
+        if (!pyRun || !pyCode) return;
+        pyRun.addEventListener("click", async () => {
+          try {
+            const py = await ensurePyodide();
+            if (pyOut) pyOut.textContent = "";
+            if (pyStatus) pyStatus.textContent = "Ejecutando...";
+            await py.runPythonAsync(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+`);
+            await py.runPythonAsync(`
+# Datos de ejemplo si no existen
+try:
+    X
+except NameError:
+    from sklearn.datasets import make_classification
+    import numpy as np
+    X, y = make_classification(n_samples=200, n_features=4, n_informative=3, n_redundant=1, random_state=42)
+`);
+            await py.runPythonAsync(pyCode.value);
+            const stdout = await py.runPythonAsync("sys.stdout.getvalue()");
+            const stderr = await py.runPythonAsync("sys.stderr.getvalue()");
+            if (pyOut) pyOut.textContent = (stdout || "") + (stderr ? "\n" + stderr : "") || "Sin salida";
+            if (pyStatus) pyStatus.textContent = "Completado";
+          } catch (e) {
+            if (pyOut) pyOut.textContent = e.toString();
+            if (pyStatus) pyStatus.textContent = "Error";
+          }
+        });
+        pyReset?.addEventListener("click", () => {
+          if (pyCode && codeOptions[currentCodeKey]) {
+            pyCode.value = codeOptions[currentCodeKey];
+          }
+          if (pyOut) pyOut.textContent = "Salida aparecerá aquí...";
+          if (pyStatus) pyStatus.textContent = "";
+        });
+      }
+      setupPythonRunner();
+
+      // Code switcher for theme 7
+      const codeOptions = {
+        code1: `from sklearn.model_selection import cross_val_score
+
+from sklearn.ensemble import RandomForestClassifier
+
+modelo = RandomForestClassifier(n_estimators=100, random_state=42)
+
+scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
+
+print("Accuracy promedio:", scores.mean())
+print("Desviación estándar:", scores.std())`,
+        code2: `from sklearn.model_selection import cross_validate
+
+from sklearn.ensemble import RandomForestClassifier
+
+modelo = RandomForestClassifier(n_estimators=100, random_state=42)
+
+cv_results = cross_validate(modelo, X, y, scoring=["accuracy", "precision_macro", "recall_macro", "f1_macro"], cv=5, return_train_score=True)
+
+print("Test F1 Macro:", cv_results["test_f1_macro"].mean())
+print("Train F1 Macro:", cv_results["train_f1_macro"].mean())  # Permite auditar overfitting`,
+        code3: `from sklearn.model_selection import cross_val_predict
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
+
+modelo = RandomForestClassifier(n_estimators=100, random_state=42)
+predicciones = cross_val_predict(modelo, X, y, cv=5)
+matriz = confusion_matrix(y, predicciones)
+print(matriz)`
+      };
+      let currentCodeKey = "code1";
+      if (pyCode) pyCode.value = codeOptions[currentCodeKey];
+      const pySelectBtns = document.querySelectorAll(".py-select");
+      pySelectBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-target");
+          if (!target || !codeOptions[target] || !pyCode) return;
+          currentCodeKey = target;
+          pyCode.value = codeOptions[target];
+          pySelectBtns.forEach(b => {
+            const isActive = b === btn;
+            b.classList.toggle("active", isActive);
+            b.setAttribute("aria-pressed", String(isActive));
+          });
+          if (pyOut) pyOut.textContent = "Salida aparecerá aquí...";
+          if (pyStatus) pyStatus.textContent = "";
+        });
+      });
+
+      // Toggle code blocks on click (cleanup if present)
+      document.querySelectorAll(".code-toggle").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-target");
+          const block = document.getElementById(target);
+          if (block) block.classList.toggle("hidden");
+          const expanded = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", String(!expanded));
+          btn.textContent = expanded ? btn.dataset.showText || "Ver código" : btn.dataset.hideText || "Ocultar código";
+        });
+      });
     })();
   </script>
 </body>
