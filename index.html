@@ -113,6 +113,19 @@
       overflow-y: auto; padding: clamp(1rem, 3vh, 2.5rem) clamp(1rem, 4vw, 4rem) 6rem;
     }
     .nested-slide > h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); }
+    .conclusion-slide {
+      height: 100vh; min-height: 0; justify-content: flex-start; gap: .35rem;
+      overflow-y: auto; padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 4vw, 4rem) 5.5rem;
+    }
+    .conclusion-slide > .eyebrow { margin-bottom: .25rem; }
+    .conclusion-slide > h2 { font-size: clamp(1.8rem, 3.2vw, 3.2rem); margin-bottom: .4rem; }
+    .conclusion-slide > .grid { gap: .75rem; }
+    .conclusion-slide .card { padding: .75rem 1rem; }
+    .conclusion-slide .card .number { font-size: 1.7rem; margin-bottom: .15rem; }
+    .conclusion-slide .card h3 { font-size: clamp(1.15rem, 1.6vw, 1.5rem); margin-bottom: .35rem; }
+    .conclusion-slide .card p { font-size: 1.1rem; margin: .3rem 0; }
+    .conclusion-slide > .lead { font-size: clamp(1.1rem, 1.7vw, 1.35rem); }
+    .conclusion-slide > .small { font-size: 1rem; }
     .nested-layout {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
       align-items: start; gap: 1.2rem; width: 100%; max-width: 1500px; min-width: 0;
@@ -339,6 +352,7 @@
       .technical-info { grid-template-columns: 1fr; }
       .leakage-layout { grid-template-columns: 1fr; }
       .nested-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
+      .conclusion-slide { height: auto; min-height: 100svh; overflow: visible; padding: 1.5rem 1rem 6rem; }
       .nested-layout { grid-template-columns: 1fr; }
       .nested-code pre { height: 32svh; font-size: .9rem; }
       .leakage-demo .leakage-code-cell { max-height: 45svh; }
@@ -937,17 +951,22 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
       </div>
     </section>
 
-    <section class="slide" aria-label="Cierre">
+    <section class="slide conclusion-slide" aria-label="Cierre">
       <span class="eyebrow">Cierre</span>
-      <h2>Una buena validación responde con honestidad</h2>
+      <h2>Conclusiones: evaluar para decidir</h2>
       <div class="grid">
-        <article class="card"><div class="number">1</div><p>Elegir el splitter según la estructura de los datos.</p></article>
-        <article class="card"><div class="number">2</div><p>Medir media y variabilidad, no sólo el mejor fold.</p></article>
-        <article class="card"><div class="number">3</div><p>Usar pipelines para evitar fuga de información.</p></article>
-        <article class="card"><div class="number">4</div><p>Separar ajuste de hiperparámetros y evaluación final.</p></article>
+        <article class="card"><div class="number">1</div><h3>La meta es generalizar</h3><p>El desempeño en entrenamiento no basta: la evaluación debe estimar la respuesta ante datos nuevos y ayudar a reconocer sobreajuste o un modelo insuficiente.</p></article>
+        <article class="card"><div class="number">2</div><h3>Importan estabilidad y propósito</h3><p>La media y la variabilidad ofrecen una visión más completa que un resultado aislado; la métrica debe reflejar las necesidades reales del problema.</p></article>
+        <article class="card"><div class="number">3</div><h3>Precisión y costo deben equilibrarse</h3><p>Una evaluación más exhaustiva puede ofrecer estimaciones más sólidas, pero requiere más entrenamientos y recursos; el nivel de análisis debe ser proporcional al problema.</p></article>
+        <article class="card"><div class="number">4</div><h3>La evidencia tiene límites</h3><p>La estimación depende de datos pertinentes y supuestos claros. En producción, hay que vigilar cambios en los datos y en el desempeño.</p></article>
       </div>
-      <p class="lead accent">Validar no es buscar el número más alto: es construir una estimación que podamos defender.</p>
-      <p class="small">Basado en el proyecto “Validación Cruzada Ampliada” y referencias de Hastie, James, Kohavi y Scikit-Learn.</p>
+      <p class="lead accent">Como técnico en ciencia de datos e inteligencia artificial, mi responsabilidad es convertir estas mediciones en decisiones reproducibles, explicar sus límites y monitorear su desempeño en condiciones reales.</p>
+      <p class="small">El mejor modelo no es necesariamente el de mayor puntaje, sino el que ofrece resultados confiables y útiles para el problema.</p>
+    </section>
+
+    <section class="slide" aria-label="Agradecimiento">
+      <span class="eyebrow">Fin</span>
+      <h2>¡Gracias por ver!</h2>
     </section>
   </main>
 
