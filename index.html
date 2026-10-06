@@ -146,7 +146,46 @@
       padding: 1.2rem 1.4rem; background: rgba(27, 29, 34, .96);
     }
     .interactive-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    .interactive input[type="range"] { width: min(25rem, 80vw); accent-color: var(--magenta); }
+    .interactive input[type="range"] {
+      width: min(24rem, 80vw);
+      height: .45rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--magenta) 0 var(--range-fill, 50%), rgba(255,255,255,.76) var(--range-fill, 50%) 100%);
+      accent-color: var(--magenta);
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .interactive input[type="range"]::-webkit-slider-runnable-track {
+      height: .45rem;
+      border-radius: 999px;
+      background: transparent;
+    }
+    .interactive input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 1.15rem;
+      height: 1.15rem;
+      margin-top: -.35rem;
+      border: 3px solid var(--magenta);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 48, 48, .28);
+    }
+    .interactive input[type="range"]::-moz-range-track {
+      height: .45rem;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+    }
+    .interactive input[type="range"]::-moz-range-thumb {
+      width: 1.15rem;
+      height: 1.15rem;
+      border: 3px solid var(--magenta);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 48, 48, .28);
+    }
     .interactive button {
       min-height: 3rem; padding: .5rem 1rem; border: 2px solid var(--cyan);
       border-radius: .6rem; background: var(--navy); color: var(--ink);
@@ -568,18 +607,18 @@
       <p class="lead">En una alerta temprana, mover el umbral cambia el equilibrio entre detectar estudiantes en riesgo y generar falsas alarmas.</p>
       <div class="interactive">
         <div class="interactive-controls">
-          <label for="threshold-range"><strong>Umbral:</strong> <output id="threshold-value">0,50</output></label>
-          <input id="threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
+          <label for="risk-threshold-range"><strong>Umbral:</strong> <output id="risk-threshold-value">0,50</output></label>
+          <input id="risk-threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
         </div>
         <table class="confusion-table">
           <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
           <tbody>
-            <tr><th>Real: riesgo</th><td id="tp-cell">TP: —</td><td id="fn-cell">FN: —</td></tr>
-            <tr><th>Real: no riesgo</th><td id="fp-cell">FP: —</td><td id="tn-cell">TN: —</td></tr>
+            <tr><th>Real: riesgo</th><td id="risk-tp-cell">TP: —</td><td id="risk-fn-cell">FN: —</td></tr>
+            <tr><th>Real: no riesgo</th><td id="risk-fp-cell">FP: —</td><td id="risk-tn-cell">TN: —</td></tr>
           </tbody>
         </table>
-        <p id="metrics-status" class="small"></p>
-        <p class="formula">Precision: <span id="precision-value">—</span> · Recall: <span id="recall-value">—</span> · F1: <span id="f1-value">—</span></p>
+        <p id="risk-metrics-status" class="small"></p>
+        <p class="formula">Precision: <span id="risk-precision-value">—</span> · Recall: <span id="risk-recall-value">—</span> · F1: <span id="risk-f1-value">—</span></p>
       </div>
       <p class="small">La matriz es ilustrativa: sirve para interpretar métricas, no para evaluar un modelo real.</p>
     </section>
@@ -789,15 +828,15 @@
       <h2>Si alerta a más estudiantes, <span class="accent">sube el recall</span> y baja la precisión</h2>
       <div class="interactive">
         <div class="interactive-controls">
-          <label for="threshold-range"><strong>Umbral de alerta:</strong> <output id="threshold-value">medio</output></label>
-          <input id="threshold-range" type="range" min="1" max="3" value="2" step="1" aria-label="Umbral de alerta: alto, medio o bajo">
+          <label for="alert-threshold-range"><strong>Umbral de alerta:</strong> <output id="alert-threshold-value">medio</output></label>
+          <input id="alert-threshold-range" type="range" min="1" max="3" value="2" step="1" aria-label="Umbral de alerta: alto, medio o bajo">
         </div>
         <div class="cv-split">
           <table class="confusion-table">
             <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
             <tbody>
-              <tr><th>Real: no aprobó</th><td id="tp-cell">VP: —</td><td id="fn-cell">FN: —</td></tr>
-              <tr><th>Real: aprobó</th><td id="fp-cell">FP: —</td><td id="tn-cell">VN: —</td></tr>
+              <tr><th>Real: no aprobó</th><td id="alert-tp-cell">VP: —</td><td id="alert-fn-cell">FN: —</td></tr>
+              <tr><th>Real: aprobó</th><td id="alert-fp-cell">FP: —</td><td id="alert-tn-cell">VN: —</td></tr>
             </tbody>
           </table>
           <div>
@@ -805,10 +844,10 @@
             <p class="small">Rojo sólido: VP · Aro rojo: FN · Blanco: FP · Gris: VN</p>
           </div>
         </div>
-        <p id="metrics-status" class="small"></p>
-        <p class="formula">Accuracy: <span id="accuracy-value">—</span> · Precision: <span id="precision-value">—</span> · Recall: <span id="recall-value">—</span> · F1: <span id="f1-value">—</span></p>
+        <p id="alert-metrics-status" class="small"></p>
+        <p class="formula">Accuracy: <span id="alert-accuracy-value">—</span> · Precision: <span id="alert-precision-value">—</span> · Recall: <span id="alert-recall-value">—</span> · F1: <span id="alert-f1-value">—</span></p>
       </div>
-      <p class="small">El umbral medio es el caso del ejemplo; los otros dos son escenarios ilustrativos sobre los mismos 100 estudiantes.</p>
+      <p class="small">Este ejemplo usa una distribución equilibrada: 50 estudiantes en riesgo y 50 sin riesgo. Los tres umbrales se comparan sobre los mismos 100 estudiantes.</p>
     </section>
 
     <section class="slide compact technical-slide" aria-label="Scikit-Learn">
@@ -1262,33 +1301,73 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
         drawEx("real");
       }
 
-      // 8) Umbral de alerta (con 100 estudiantes en pantalla)
-      const thr = document.querySelector("#threshold-range");
-      if (thr) {
+      // 8a) Umbral de riesgo (ejemplo del estudiante)
+      const riskThr = document.querySelector("#risk-threshold-range");
+      if (riskThr) {
+        const scenarios = [
+          { threshold: 0.3, tp: 8, fp: 6, fn: 2, tn: 84, label: "0,30" },
+          { threshold: 0.5, tp: 6, fp: 2, fn: 4, tn: 88, label: "0,50" },
+          { threshold: 0.8, tp: 4, fp: 1, fn: 6, tn: 89, label: "0,80" }
+        ];
+        function renderRiskMetrics() {
+          const threshold = Number(riskThr.value);
+          const min = Number(riskThr.min), max = Number(riskThr.max);
+          const percent = ((threshold - min) / (max - min)) * 100;
+          riskThr.style.setProperty("--range-fill", `${percent}%`);
+          const target = scenarios.reduce((best, item) => {
+            const distance = Math.abs(item.threshold - threshold);
+            return distance < best.distance ? { item, distance } : best;
+          }, { item: scenarios[1], distance: Infinity }).item;
+          const precision = target.tp / (target.tp + target.fp);
+          const recall = target.tp / (target.tp + target.fn);
+          const f1 = (2 * precision * recall) / (precision + recall);
+          setText("risk-threshold-value", target.label);
+          setText("risk-tp-cell", `TP: ${target.tp}`); setText("risk-fn-cell", `FN: ${target.fn}`);
+          setText("risk-fp-cell", `FP: ${target.fp}`); setText("risk-tn-cell", `TN: ${target.tn}`);
+          setText("risk-precision-value", pct(precision));
+          setText("risk-recall-value", pct(recall));
+          setText("risk-f1-value", pct(f1));
+          setText("risk-metrics-status", threshold <= 0.4
+            ? "Umbral bajo: alerta más estudiantes, detecta más casos en riesgo, pero aumenta la cantidad de falsas alarmas."
+            : threshold >= 0.7
+              ? "Umbral alto: reduce las falsas alarmas, pero deja pasar más estudiantes en riesgo."
+              : "Umbral medio: equilibrio práctico entre sensibilidad y precisión.");
+        }
+        riskThr.addEventListener("input", renderRiskMetrics);
+        renderRiskMetrics();
+      }
+
+      // 8) Umbral de alerta (100 estudiantes, clases equilibradas)
+      const alertThr = document.querySelector("#alert-threshold-range");
+      if (alertThr) {
         const scenarios = {
-          1: { label: "alto", tp: 4, fp: 1, fn: 6, tn: 89, msg: "Umbral alto: alerta a pocos estudiantes. Casi no hay falsas alarmas, pero se escapan 6 de los 10 que no aprobaron." },
-          2: { label: "medio", tp: 6, fp: 2, fn: 4, tn: 88, msg: "Umbral medio (ejemplo del documento): acierta 3 de cada 4 alertas y detecta a 6 de los 10 en riesgo." },
-          3: { label: "bajo", tp: 8, fp: 6, fn: 2, tn: 84, msg: "Umbral bajo: detecta a 8 de los 10 en riesgo, pero aumentan las falsas alarmas y baja la precisión." }
+          1: { label: "alto", tp: 20, fp: 5, fn: 30, tn: 45, msg: "Umbral alto: alerta a pocos estudiantes. Casi no hay falsas alarmas, pero se escapan 30 de los 50 que están en riesgo." },
+          2: { label: "medio", tp: 30, fp: 10, fn: 20, tn: 40, msg: "Umbral medio: acierta 3 de cada 4 alertas y detecta a 30 de los 50 estudiantes en riesgo." },
+          3: { label: "bajo", tp: 40, fp: 30, fn: 10, tn: 20, msg: "Umbral bajo: detecta a 40 de los 50 estudiantes en riesgo, pero aumentan las falsas alarmas y baja la precisión." }
         };
         const dots = $("dots");
         function renderMetrics() {
-          const s = scenarios[thr.value] || scenarios[2];
+          const s = scenarios[alertThr.value] || scenarios[2];
+          const min = Number(alertThr.min), max = Number(alertThr.max);
+          const value = Number(alertThr.value);
+          const percent = ((value - min) / (max - min)) * 100;
+          alertThr.style.setProperty("--range-fill", `${percent}%`);
           const precision = s.tp / (s.tp + s.fp);
           const recall = s.tp / (s.tp + s.fn);
           const f1 = (2 * precision * recall) / (precision + recall);
-          setText("threshold-value", s.label);
-          setText("tp-cell", `VP: ${s.tp}`); setText("fn-cell", `FN: ${s.fn}`);
-          setText("fp-cell", `FP: ${s.fp}`); setText("tn-cell", `VN: ${s.tn}`);
-          setText("accuracy-value", pct((s.tp + s.tn) / 100));
-          setText("precision-value", pct(precision)); setText("recall-value", pct(recall)); setText("f1-value", pct(f1));
-          setText("metrics-status", s.msg);
+          setText("alert-threshold-value", s.label);
+          setText("alert-tp-cell", `VP: ${s.tp}`); setText("alert-fn-cell", `FN: ${s.fn}`);
+          setText("alert-fp-cell", `FP: ${s.fp}`); setText("alert-tn-cell", `VN: ${s.tn}`);
+          setText("alert-accuracy-value", pct((s.tp + s.tn) / 100));
+          setText("alert-precision-value", pct(precision)); setText("alert-recall-value", pct(recall)); setText("alert-f1-value", pct(f1));
+          setText("alert-metrics-status", s.msg);
           if (dots) {
             if (dots.children.length !== 100) dots.innerHTML = '<span class="dot"></span>'.repeat(100);
             const cls = [...Array(s.tp).fill("vp"), ...Array(s.fn).fill("fn"), ...Array(s.fp).fill("fp"), ...Array(s.tn).fill("vn")];
             [...dots.children].forEach((d, i) => { d.className = `dot ${cls[i]}`; });
           }
         }
-        thr.addEventListener("input", renderMetrics);
+        alertThr.addEventListener("input", renderMetrics);
         renderMetrics();
       }
 
