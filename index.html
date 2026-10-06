@@ -153,6 +153,99 @@
       font: inherit; font-weight: 700; cursor: pointer;
     }
     .interactive button:hover, .interactive button:focus-visible { background: var(--cyan); color: var(--navy); }
+    .k-demo-slide .lead {
+      max-width: 1180px; font-size: clamp(1.5rem, 2vw, 2.4rem);
+      line-height: 1.35;
+    }
+    .k-demo-panel {
+      width: min(100%, 1200px);
+      padding: 1.5rem 1.3rem 1.2rem;
+      border: 3px solid var(--magenta);
+      border-radius: 1rem;
+      background: rgba(19, 20, 24, .9);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+    }
+    .k-demo-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1.4rem;
+      margin: 0;
+    }
+    .k-demo-label {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      color: var(--ink);
+      font-size: clamp(1.9rem, 2.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .k-demo-label output {
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .k-demo-slider {
+      width: 100%;
+      height: .45rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--magenta) 0 50%, rgba(255,255,255,.8) 50% 100%);
+      accent-color: var(--magenta);
+      cursor: pointer;
+    }
+    .k-demo-slider::-webkit-slider-runnable-track {
+      height: .45rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+    }
+    .k-demo-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 1.2rem;
+      height: 1.2rem;
+      margin-top: -.36rem;
+      border: 3px solid var(--magenta);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 48, 48, .32);
+    }
+    .k-demo-button {
+      min-height: 3.2rem;
+      padding: .6rem 1.2rem;
+      border: 2px solid var(--cyan);
+      border-radius: .8rem;
+      background: transparent;
+      color: var(--ink);
+      font-size: clamp(1.35rem, 1.8vw, 2.2rem);
+      line-height: 1.1;
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    .k-demo-button:hover, .k-demo-button:focus-visible {
+      background: var(--cyan);
+      color: var(--navy);
+    }
+    .k-demo-panel .demo-folds {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(2rem, 1fr));
+      gap: .35rem;
+      margin: 1.1rem 0 0;
+    }
+    .k-demo-score {
+      display: inline-flex;
+      align-items: center;
+      min-height: 4rem;
+      margin-top: 1.3rem;
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--cyan);
+      border-radius: .8rem;
+      background: transparent;
+      color: var(--ink);
+      font-size: clamp(1.5rem, 2vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.2;
+    }
     .interactive .py-select { min-height: 2.5rem; padding: .4rem .8rem; }
     .interactive .py-select.active { background: var(--navy); border-color: var(--cyan); }
     .interactive .py-select:not(.active) { background: rgba(27, 29, 34, .9); border-color: var(--line); }
@@ -452,19 +545,19 @@
       <p class="lead">En Educational Data Mining, anticipar la condición final permite tutorías y alertas tempranas; con pocos datos, un hold-out puede depender demasiado de qué estudiantes cayeron en test. K-Fold reduce esa dependencia.</p>
     </section>
 
-    <section class="slide compact" aria-label="Ejemplo práctico interactivo">
+    <section class="slide compact k-demo-slide" aria-label="Ejemplo práctico interactivo">
       <span class="eyebrow">Ejemplo práctico interactivo</span>
       <h2>Probemos distintos valores de <span class="accent">k</span></h2>
       <p class="lead">Hay 10 observaciones de estudiantes. Elegí cuántos folds usar y observá qué grupo queda como test en cada vuelta.</p>
-      <div class="interactive">
-        <div class="interactive-controls">
-          <label for="fold-range"><strong>Folds:</strong> <output id="fold-value">5</output></label>
-          <input id="fold-range" type="range" min="2" max="10" value="5" step="1">
-          <button id="next-fold" type="button">Cambiar vuelta</button>
+      <div class="interactive k-demo-panel">
+        <div class="interactive-controls k-demo-row">
+          <label class="k-demo-label" for="fold-range"><span>Folds:</span> <output id="fold-value">5</output></label>
+          <input id="fold-range" class="k-demo-slider" type="range" min="2" max="10" value="5" step="1">
+          <button id="next-fold" class="k-demo-button" type="button">Cambiar vuelta</button>
         </div>
         <div id="demo-folds" class="demo-folds" aria-label="Distribución interactiva de observaciones"></div>
         <p id="demo-status" class="small"></p>
-        <p class="formula">Accuracy promedio: <span id="demo-score">—</span></p>
+        <p class="formula k-demo-score">Accuracy promedio: <span id="demo-score">—</span></p>
       </div>
       <p class="small">La métrica es ilustrativa: la interacción muestra la lógica de particionar, entrenar, evaluar y promediar.</p>
     </section>
@@ -1024,6 +1117,52 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
         row.addEventListener("click", pick);
         row.addEventListener("keydown", (e) => { if (e.key === "Enter") pick(); });
       });
+
+      // 2b) K-Fold demo: cambiar valor de k y la vuelta activa
+      const foldRange = $("fold-range");
+      const foldValue = $("fold-value");
+      const demoScore = $("demo-score");
+      const demoStatus = $("demo-status");
+      const demoFolds = $("demo-folds");
+      const nextFoldBtn = $("next-fold");
+      if (foldRange && foldValue && demoScore && demoStatus && demoFolds && nextFoldBtn) {
+        const studentScores = [88, 92, 90, 91, 89, 90, 88, 91, 92, 89];
+        let activeFold = 0;
+        const renderDemo = (showMetric = false) => {
+          const k = Number(foldRange.value);
+          const testFold = activeFold % k;
+          foldValue.textContent = String(k);
+          if (!showMetric) {
+            demoScore.textContent = "—";
+            demoStatus.textContent = "";
+            demoFolds.innerHTML = Array.from({ length: 10 }, (_, i) => `<div class="demo-fold train" aria-label="Estudiante ${i + 1}: entrenamiento">F${(i % k) + 1}</div>`).join("");
+            demoFolds.style.gridTemplateColumns = "repeat(10, minmax(2rem, 1fr))";
+            return;
+          }
+          const scoreValues = studentScores.slice(0, k);
+          const mean = scoreValues.reduce((sum, value) => sum + value, 0) / scoreValues.length;
+          demoStatus.textContent = `Vuelta ${activeFold + 1} de ${k}: el Fold ${testFold + 1} queda como prueba.`;
+          demoScore.textContent = `${Math.round(mean)}%`;
+          const cells = Array.from({ length: 10 }, (_, i) => {
+            const foldIndex = i % k;
+            const isTest = foldIndex === testFold;
+            const className = isTest ? "demo-fold test" : "demo-fold train";
+            const label = isTest ? `T${testFold + 1}` : `F${foldIndex + 1}`;
+            return `<div class="${className}" aria-label="Estudiante ${i + 1}: ${isTest ? "prueba" : "entrenamiento"}">${label}</div>`;
+          });
+          demoFolds.innerHTML = cells.join("");
+          demoFolds.style.gridTemplateColumns = `repeat(${Math.min(10, k)}, minmax(2rem, 1fr))`;
+        };
+        foldRange.addEventListener("input", () => {
+          activeFold = 0;
+          renderDemo(true);
+        });
+        nextFoldBtn.addEventListener("click", () => {
+          activeFold = (activeFold + 1) % Number(foldRange.value);
+          renderDemo(true);
+        });
+        renderDemo(false);
+      }
 
       // 3) Costo: cantidad de modelos a entrenar
       const nR = $("cost-n");
