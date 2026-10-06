@@ -40,7 +40,19 @@
         linear-gradient(135deg, var(--navy), #050505 75%);
     }
     .slide.active { display: flex; flex-direction: column; justify-content: center; }
-    .slide.compact { justify-content: flex-start; padding-top: clamp(1.7rem, 4vw, 3.5rem); }
+    .slide.compact { justify-content: center; }
+    .slide > h1, .slide > h2, .slide > h3, .slide > .eyebrow, .slide > .lead, .slide > .small, .slide > .quote { text-align: center; margin-inline: auto; }
+    .grid, .interactive, .flow, .folds, .kf, .confusion-table, .demo-folds, .bars, .strat-folds, .cv-controls, .bias-comparison-wrap, .technical-layout, .nested-layout, .leakage-layout, .cv-split { width: 100%; margin-inline: auto; }
+    .formula, .math { margin-inline: auto; }
+    .math { width: fit-content; }
+    .slide > .bias-summary { text-align: center; width: 100%; max-width: 900px; margin: 1rem auto 0; }
+    .slide > article.card { width: fit-content; margin-inline: auto; text-align: center; }
+    .interactive .formula { display: table; margin: .8rem auto; }
+    .interactive .bias-summary { text-align: center; }
+    .cv-controls { justify-content: center; }
+    .interactive-controls { justify-content: center; }
+    .confusion-table tbody th, .confusion-table thead th { text-align: center; }
+    .slide.cover > h1, .slide.cover > .eyebrow, .slide.cover > .lead, .slide.cover > .small { text-align: left; margin-inline: 0; }
     .eyebrow {
       color: var(--cyan);
       font-size: 1.25rem;
@@ -135,7 +147,7 @@
     .flow { display: flex; align-items: stretch; gap: .65rem; max-width: 1200px; margin-top: 1.5rem; }
     .flow > div { flex: 1; padding: 1rem; border: 2px solid var(--cyan); border-radius: .8rem; text-align: center; background: rgba(16, 17, 20, .92); }
     .arrow { align-self: center; color: var(--magenta); font-size: 2rem; font-weight: 900; }
-    .folds { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; max-width: 900px; margin: 1.5rem 0; }
+    .folds { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; max-width: 900px; margin: 1.5rem auto; }
     .fold { border-radius: .5rem; overflow: hidden; border: 2px solid var(--line); }
     .fold span { display: block; height: 3rem; }
     .train { background: #ffffff; }
@@ -262,13 +274,19 @@
       height: 100vh; min-height: 0; justify-content: flex-start;
       overflow-y: auto; padding-bottom: 6rem;
     }
-    .confusion-table { width: 100%; max-width: 850px; border-collapse: collapse; margin: 1rem 0; }
+    .technical-slide > :first-child, .nested-slide > :first-child, .leakage-slide > :first-child, .slide.editor-expanded-slide > :first-child { margin-top: auto; }
+    .technical-slide > :last-child, .nested-slide > :last-child, .leakage-slide > :last-child, .slide.editor-expanded-slide > :last-child { margin-bottom: auto; }
+    .demo-folds { display: grid; grid-template-columns: repeat(10, minmax(2rem, 1fr)); gap: .35rem; margin: 1.2rem 0; }
+    .demo-fold { min-height: 4rem; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: .4rem; border: 1px solid var(--line); font-weight: 800; }
+    .demo-fold.train { background: rgba(103, 232, 249, .75); color: var(--navy); }
+    .demo-fold.test { background: var(--magenta); color: var(--navy); }
+    .confusion-table { width: 100%; max-width: 850px; border-collapse: collapse; margin: 1rem auto; }
     .confusion-table th, .confusion-table td { border: 1px solid var(--line); padding: .65rem; text-align: center; font-size: 1.25rem; }
     .confusion-table th { color: var(--cyan); background: var(--navy); }
     .confusion-table td { background: rgba(2, 8, 23, .7); }
     .formula {
       display: inline-block; background: #050505; border: 2px solid var(--blue); border-radius: .8rem;
-      padding: 1rem 1.4rem; color: var(--blue); font-size: clamp(1.25rem, 2.4vw, 2rem); margin: .8rem 0;
+      padding: 1rem 1.4rem; color: var(--blue); font-size: clamp(1.25rem, 2.4vw, 2rem); margin: .8rem auto;
     }
     pre {
       background: #050505; border: 1px solid var(--line); border-left: 5px solid var(--magenta);
@@ -340,14 +358,14 @@
         justify-self: center; width: min(100%, 22rem);
       }
     }
-    .kf { display: grid; gap: .5rem; max-width: 1100px; margin: 1rem 0; }
+    .kf { display: grid; gap: .5rem; max-width: 1100px; margin: 1rem auto; }
     .kf-row { display: grid; grid-template-columns: 8.5rem repeat(5, minmax(0, 1fr)); gap: .4rem; align-items: stretch; }
     .kf-row b { align-self: center; color: var(--muted); font-size: 1.1rem; }
     .kf-row .c { text-align: center; padding: .55rem 0; border-radius: .4rem; border: 1px solid var(--line); font-weight: 800; font-size: 1.05rem; }
     .kf-row .tr { background: #ffffff; color: var(--navy); }
     .kf-row .te { background: var(--magenta); border-color: var(--magenta); color: #ffffff; }
     .kf-row .un { background: transparent; border-style: dashed; color: var(--muted); }
-    .exhaustive-visuals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; max-width: 1300px; }
+    .exhaustive-visuals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; max-width: 1300px; width: 100%; margin-inline: auto; }
     .exhaustive-method { min-width: 0; padding: 1rem; }
     .exhaustive-method h3 { margin-bottom: .35rem; }
     .exhaustive-method > p { margin: .25rem 0 .6rem; }
@@ -357,7 +375,7 @@
     .exhaustive-sample { display: grid; place-items: center; min-height: 1.8rem; border-radius: .35rem; font-size: .9rem; font-weight: 800; }
     .exhaustive-sample.train { background: #fff; color: var(--navy); }
     .exhaustive-sample.test { background: var(--magenta); color: #fff; }
-    .exhaustive-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .65rem; font-size: .9rem; }
+    .exhaustive-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .65rem; font-size: .9rem; justify-content: center; }
     .exhaustive-legend span { display: inline-flex; align-items: center; gap: .4rem; }
     .exhaustive-legend .exhaustive-sample { width: 1.4rem; min-height: 1.4rem; }
     .exhaustive-takeaway { max-width: 1300px; margin-top: .8rem; }
@@ -365,7 +383,7 @@
     .bar-row { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 3.5rem; gap: .7rem; align-items: center; font-size: 1.25rem; }
     .bar-row i { display: block; height: 1.4rem; border-radius: .4rem; background: linear-gradient(90deg, #ffffff, var(--magenta)); }
     @media (max-width: 800px) { .kf-row { grid-template-columns: 5.5rem repeat(5, minmax(0, 1fr)); } .kf-row .c { font-size: .85rem; } }
-    .math { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; width: fit-content; max-width: 100%; margin: .8rem 0; padding: 1rem 1.6rem; background: #050505; border: 2px solid var(--blue); border-radius: .8rem; color: var(--ink); font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", serif; font-size: clamp(1.4rem, 2.6vw, 2.4rem); line-height: 1.2; }
+    .math { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; width: fit-content; max-width: 100%; margin: .8rem auto; padding: 1rem 1.6rem; background: #050505; border: 2px solid var(--blue); border-radius: .8rem; color: var(--ink); font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", serif; font-size: clamp(1.4rem, 2.6vw, 2.4rem); line-height: 1.2; }
     .math sub { font-size: .62em; line-height: 0; }
     .math .frac { display: inline-flex; flex-direction: column; align-items: center; text-align: center; }
     .math .frac > span:first-child { padding: 0 .3em .12em; border-bottom: .06em solid currentColor; }
@@ -401,7 +419,7 @@
     .dot.vn { background: rgba(255, 255, 255, .14); }
     .dots { display: grid; grid-template-columns: repeat(10, 1.15rem); gap: .25rem; width: max-content; }
     .cv-split { display: grid; grid-template-columns: minmax(0, 1.3fr) auto; gap: 1.5rem; align-items: center; }
-    .strat-folds { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+    .strat-folds { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; margin: 1rem auto; }
     .strat-col { display: grid; gap: .5rem; justify-items: center; padding: .7rem .4rem; border: 1px solid var(--line); border-radius: .8rem; background: rgba(16, 17, 20, .72); }
     .strat-col.warn { border-color: var(--magenta); background: rgba(255, 48, 48, .12); }
     .strat-dots { display: flex; flex-wrap: wrap; gap: .3rem; justify-content: center; }
@@ -410,7 +428,7 @@
     @media (prefers-reduced-motion: reduce) { .cv-anim *, .cv-anim.active * { animation: none !important; transition: none !important; } }
     @media print {
       body { overflow: visible; background: white; }
-      .slide, .slide.active { display: flex; min-height: 100vh; page-break-after: always; color: #08152d; background: white; }
+      .slide, .slide.active { display: flex; height: 100vh; min-height: 0; overflow: hidden; page-break-after: always; color: #08152d; background: white; }
       .footer { display: none; }
       .card, pre { color: #08152d; background: #f8fafc; box-shadow: none; }
     }
@@ -418,13 +436,14 @@
 </head>
 <body>
   <main class="deck" aria-live="polite">
-    <section class="slide active" aria-label="Portada">
+    <section class="slide active cover" aria-label="Portada">
       <span class="eyebrow">Aprendizaje Automático I · Ciclo 2026</span>
       <h1>Validación<br><span class="accent">Cruzada</span></h1>
       <div class="rule"></div>
       <p class="lead">Cómo estimar el rendimiento real de un modelo y tomar decisiones sin dejarnos engañar por una sola partición de datos.</p>
       <p class="small">Instituto de Educación Superior de Educación Técnica y Formación Profesional</p>
-      <p class="small">Docente: Di Nubila, Jose · Ravarotto, Iván Tomás · Santagata, Julian Gabriel · Drocezesky, Clara Denise</p>
+      <p class="small">Docente: Di Nubila, Jose</p>
+      <p class="small">Alumnos: Ravarotto, Iván Tomás - Santagata, Julian Gabriel - Drocezesky, Clara Denise</p>
     </section>
 
     <section class="slide" aria-label="Introducción">
@@ -435,6 +454,7 @@
         <article class="card"><div class="number">B</div><h3>Generalización</h3><p>El modelo responde correctamente ante observaciones nuevas e independientes.</p><p class="accent">Objetivo: rendimiento confiable en producción.</p></article>
       </div>
       <p class="quote">La pregunta no es “¿qué tan bien recuerda?”, sino “¿qué tan bien predice lo que todavía no vio?”</p>
+      <p class="small">Evaluar con los mismos datos de entrenamiento es un error frecuente: sobreestima el rendimiento. La validación cruzada surge como marco sistemático para aprovechar las muestras sin perder independencia estadística.</p>
     </section>
 
     <section class="slide" aria-label="Qué es la validación cruzada">
@@ -447,7 +467,8 @@
         <div><strong class="accent">Evaluar</strong><br>con el fold restante</div><span class="arrow">→</span>
         <div><strong class="accent">Resumir</strong><br>media + dispersión</div>
       </div>
-      <p class="small">Cada observación aparece en validación exactamente una vez dentro del ciclo K-Fold.</p>
+      <p class="small">Cada observación aparece en validación exactamente una vez dentro del ciclo K-Fold. Las métricas de cada iteración se resumen con la media y la desviación estándar, generando una estimación insesgada del error de generalización.</p>
+      <p class="bias-summary">Definición formal: estima el error de generalización mediante múltiples particiones disjuntas de entrenamiento y prueba, reduciendo la dependencia y el sesgo de una única división aleatoria.</p>
     </section>
 
     <section class="slide" aria-label="Objetivos y aplicaciones">
@@ -457,7 +478,8 @@
         <article class="card"><div class="number">3.1</div><h3>Desempeño real</h3><p>Estima cómo funcionará frente a datos desconocidos.</p></article>
         <article class="card"><div class="number">3.2</div><h3>Overfitting</h3><p>Detecta cuando el modelo memoriza el entrenamiento.</p></article>
         <article class="card"><div class="number">3.3</div><h3>Underfitting</h3><p>Identifica un modelo demasiado simple para el problema.</p></article>
-        <article class="card"><div class="number">3.4</div><h3>Estabilidad</h3><p>La dispersión entre folds muestra sensibilidad al muestreo.</p></article>
+        <article class="card"><div class="number">3.4</div><h3>Estabilidad</h3><p>La dispersión entre folds muestra sensibilidad al muestreo: una desviación baja indica consistencia.</p></article>
+        <article class="card"><div class="number">3.5</div><h3>Comparación justa</h3><p>Permite contrastar Árboles de Decisión, Random Forest, SVM y Regresión Logística sobre las mismas particiones, sin depender de la suerte del muestreo.</p></article>
       </div>
     </section>
 
@@ -476,7 +498,7 @@
         <div id="kf-bar" class="kf-row kf-bar" aria-live="polite"></div>
         <p id="kf-text" class="small"></p>
       </div>
-      <div class="grid">
+      <div class="grid" style="margin-top: 2rem;">
         <div class="card"><h3><span class="accent">Blanco</span> · entrenamiento</h3><p>Todos los folds menos uno.</p></div>
         <div class="card"><h3><span class="magenta">Rojo</span> · prueba</h3><p>Un fold distinto en cada iteración.</p></div>
       </div>
@@ -626,7 +648,7 @@
         <div class="cv-controls"><button id="ts-next" type="button">Siguiente split ▶</button><span id="ts-text" class="small"></span></div>
         <p class="small">Blanco: entrenamiento · Rojo: prueba · Punteado: aún no usado.</p>
       </div>
-      <article class="card bad"><h3>Nunca mezclar aleatoriamente una serie temporal</h3><p>Se filtraría información del futuro hacia el entrenamiento.</p></article>
+      <article class="card bad" style="margin-top: 10px;"><h3>Nunca mezclar aleatoriamente una serie temporal</h3><p>Se filtraría información del futuro hacia el entrenamiento.</p></article>
     </section>
     <section class="slide cv-anim compact technical-slide" aria-label="Validación anidada y buenas prácticas">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
@@ -915,15 +937,6 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
       </div>
     </section>
 
-    <section class="slide compact" aria-label="Glosario y referencias">
-      <span class="eyebrow">Glosario · Referencias bibliográficas</span>
-      <h2>Conceptos y fuentes</h2>
-      <div class="grid">
-        <article class="card"><h3 class="accent">Glosario</h3><p><strong>Fold:</strong> pliegue de datos.</p><p><strong>Overfitting:</strong> sobreajuste.</p><p><strong>Leakage:</strong> fuga de información.</p><p><strong>Pipeline:</strong> cadena reproducible de transformaciones y modelo.</p></article>
-        <article class="card"><h3 class="accent">Referencias</h3><p>Hastie, Tibshirani & Friedman (2009).</p><p>James, Witten, Hastie & Tibshirani (2021).</p><p>Kohavi (1995).</p><p>Documentación oficial de Scikit-Learn.</p></article>
-      </div>
-    </section>
-
     <section class="slide" aria-label="Cierre">
       <span class="eyebrow">Cierre</span>
       <h2>Una buena validación responde con honestidad</h2>
@@ -997,6 +1010,13 @@ print("Desviación estándar:", round(nested_scores.std(), 2))</code></pre>
         };
         range.addEventListener("input", updateRangeFill);
         updateRangeFill();
+      });
+
+      // Sincroniza el relleno rojo de todos los sliders con su valor
+      document.querySelectorAll('input[type="range"]').forEach((r) => {
+        const sync = () => { const min = Number(r.min), max = Number(r.max), v = Number(r.value); r.style.setProperty("--range-fill", `${((v - min) / (max - min)) * 100}%`); };
+        r.addEventListener("input", sync);
+        sync();
       });
 
       // 1) K-Fold: reproductor de iteraciones (N = 1000)
