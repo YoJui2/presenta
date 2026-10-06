@@ -1330,46 +1330,50 @@ print(matriz)`
         incorrect: {
           title: "Código · Práctica incorrecta",
           observation: "El scaler se ajusta antes de separar los folds y usa las 200 observaciones, incluidas las de test. Aunque la métrica coincida con la práctica correcta, la evaluación queda contaminada.",
-          code: `from sklearn.datasets import make_classification
+          code: `import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.feature_selection import SelectKBest, f_classif
 
-X, y = make_classification(n_samples=200, n_features=6, n_informative=4, random_state=42)
+rng = np.random.RandomState(42)
+X = rng.randn(100, 2000)           # 100 muestras, 2000 variables de ruido
+y = rng.randint(0, 2, size=100)    # etiquetas aleatorias
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 model = LogisticRegression(max_iter=1000)
 
-# Incorrecto: el scaler ve todos los datos antes de crear los folds
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-scores = cross_val_score(model, X_scaled, y, cv=5, scoring="accuracy")
+# Incorrecto: la selección de variables usa y de TODAS las filas,
+# incluyendo las que luego serán test en cada fold
+X_sel = SelectKBest(f_classif, k=20).fit_transform(X, y)
+scores = cross_val_score(model, X_sel, y, cv=cv, scoring="accuracy")
 
-print("Accuracy por fold:", [round(score, 2) for score in scores])
-print("Accuracy promedio:", round(scores.mean(), 2))
-print("Observaciones usadas para ajustar el scaler:", scaler.n_samples_seen_)
-print("Se incluyeron también las observaciones de test.")`
+print("Accuracy por fold:", [round(s, 2) for s in scores])
+print("Accuracy promedio:", round(scores.mean(), 2))`
         },
         correct: {
           title: "Código · Práctica correcta · Pipeline",
           observation: "En cada fold, el scaler aprende sólo de las 160 observaciones de entrenamiento; las 40 de test no participan en el ajuste. Así se evita la fuga de información.",
-          code: `from sklearn.datasets import make_classification
+          code: `import numpy as np
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
-X, y = make_classification(n_samples=200, n_features=6, n_informative=4, random_state=42)
+# Mismos datos de puro ruido: 100 muestras, 2000 variables, etiquetas aleatorias.
+rng = np.random.RandomState(42)
+X = rng.randn(100, 2000)
+y = rng.randint(0, 2, size=100)
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 model = LogisticRegression(max_iter=1000)
 
-# Correcto: el scaler se ajusta sólo con el train de cada fold
-pipe = make_pipeline(StandardScaler(), model)
-cv_results = cross_validate(pipe, X, y, cv=5, scoring="accuracy", return_estimator=True)
-scores = cv_results["test_score"]
-scaler = cv_results["estimator"][0].named_steps["standardscaler"]
+# CORRECTO: la selección de variables ocurre dentro de cada fold,
+# ajustándose únicamente con el train de ese fold.
+pipe = make_pipeline(SelectKBest(f_classif, k=20), model)
+scores = cross_val_score(pipe, X, y, cv=cv, scoring="accuracy")
 
-print("Accuracy por fold:", [round(score, 2) for score in scores])
-print("Accuracy promedio:", round(scores.mean(), 2))
-print("Observaciones usadas por el scaler en el primer fold:", scaler.n_samples_seen_)
-print("De 200 registros, 160 son train y 40 quedan para test.")`
+print("Accuracy por fold:", [round(s, 2) for s in scores])
+print("Accuracy promedio:", round(scores.mean(), 2))`
         }
       };
       const leakageCodeTitle = document.getElementById("leakage-code-title");
