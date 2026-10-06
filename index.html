@@ -563,7 +563,6 @@
         <div class="card"><h3><span class="magenta">Rojo</span> · prueba</h3><p>Un fold distinto en cada iteración.</p></div>
       </div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Fórmula del rendimiento K-Fold">
       <span class="eyebrow">4 · Funcionamiento matemático y algorítmico</span>
       <h2>De cinco iteraciones a <span class="accent">una métrica global</span></h2>
@@ -572,7 +571,6 @@
       <p class="small">Con k = 5 el modelo completa exactamente 5 iteraciones y la sumatoria queda en el rango i ∈ [1, 5]:</p>
       <div class="math" role="math" aria-label="Accuracy promedio igual a 1 sobre 5 por la sumatoria de Accuracy i, de i igual 1 a 5"><span>Accuracy<sub>promedio</sub></span><span>=</span><span class="frac"><span>1</span><span>5</span></span><span class="sum"><span class="lim">5</span><span class="big">∑</span><span class="lim"><i>i</i>=1</span></span><span>Accuracy<sub><i>i</i></sub></span><span>=</span><span class="frac"><span>Accuracy<sub>1</sub> + Accuracy<sub>2</sub> + … + Accuracy<sub>5</sub></span><span>5</span></span></div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo educativo: planteamiento">
       <span class="eyebrow">4 · Ejemplo: predecir si un estudiante aprobará</span>
       <h2>Del dato a una <span class="accent">alerta temprana</span></h2>
@@ -583,68 +581,6 @@
       </div>
       <p class="lead">En Educational Data Mining, anticipar la condición final permite tutorías y alertas tempranas; con pocos datos, un hold-out puede depender demasiado de qué estudiantes cayeron en test. K-Fold reduce esa dependencia.</p>
     </section>
-
-    <section class="slide compact k-demo-slide" aria-label="Ejemplo práctico interactivo">
-      <span class="eyebrow">Ejemplo práctico interactivo</span>
-      <h2>Probemos distintos valores de <span class="accent">k</span></h2>
-      <p class="lead">Hay 10 observaciones de estudiantes. Elegí cuántos folds usar y observá qué grupo queda como test en cada vuelta.</p>
-      <div class="interactive k-demo-panel">
-        <div class="interactive-controls k-demo-row">
-          <label class="k-demo-label" for="fold-range"><span>Folds:</span> <output id="fold-value">5</output></label>
-          <input id="fold-range" class="k-demo-slider" type="range" min="2" max="10" value="5" step="1">
-          <button id="next-fold" class="k-demo-button" type="button">Cambiar vuelta</button>
-        </div>
-        <div id="demo-folds" class="demo-folds" aria-label="Distribución interactiva de observaciones"></div>
-        <p id="demo-status" class="small"></p>
-        <p class="formula k-demo-score">Accuracy promedio: <span id="demo-score">—</span></p>
-      </div>
-      <p class="small">La métrica es ilustrativa: la interacción muestra la lógica de particionar, entrenar, evaluar y promediar.</p>
-    </section>
-
-    <section class="slide compact" aria-label="Ejemplo interactivo de métricas">
-      <span class="eyebrow">Ejemplo práctico · Métricas</span>
-      <h2>¿Qué cambia cuando ajustamos el umbral?</h2>
-      <p class="lead">En una alerta temprana, mover el umbral cambia el equilibrio entre detectar estudiantes en riesgo y generar falsas alarmas.</p>
-      <div class="interactive">
-        <div class="interactive-controls">
-          <label for="risk-threshold-range"><strong>Umbral:</strong> <output id="risk-threshold-value">0,50</output></label>
-          <input id="risk-threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
-        </div>
-        <table class="confusion-table">
-          <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
-          <tbody>
-            <tr><th>Real: riesgo</th><td id="risk-tp-cell">TP: —</td><td id="risk-fn-cell">FN: —</td></tr>
-            <tr><th>Real: no riesgo</th><td id="risk-fp-cell">FP: —</td><td id="risk-tn-cell">TN: —</td></tr>
-          </tbody>
-        </table>
-        <p id="risk-metrics-status" class="small"></p>
-        <p class="formula">Precision: <span id="risk-precision-value">—</span> · Recall: <span id="risk-recall-value">—</span> · F1: <span id="risk-f1-value">—</span></p>
-      </div>
-      <p class="small">La matriz es ilustrativa: sirve para interpretar métricas, no para evaluar un modelo real.</p>
-    </section>
-
-    <section class="slide compact" aria-label="Tipos y estrategias">
-      <span class="eyebrow">5 · Tipos y estrategias de validación cruzada</span>
-      <h2>No todos los datos se validan igual</h2>
-      <div class="grid">
-        <article class="card"><h3 class="accent">Hold-out</h3><p>Una división 80/20 o 70/30. Rápida, pero sensible al corte.</p></article>
-        <article class="card"><h3 class="accent">K-Fold</h3><p>Uso general. Habitualmente k = 5 o 10.</p></article>
-        <article class="card"><h3 class="accent">Stratified K-Fold</h3><p>Conserva la proporción de clases. Ideal para clasificación desbalanceada.</p></article>
-        <article class="card"><h3 class="accent">TimeSeriesSplit</h3><p>Respeta el orden temporal. Nunca entrena con el futuro.</p></article>
-        <article class="card"><h3 class="accent">GroupKFold</h3><p>Mantiene juntos grupos relacionados para evitar contaminación.</p></article>
-        <article class="card"><h3 class="accent">LOO / LPO</h3><p>Deja una o p observaciones afuera. Poco sesgo, alto costo.</p></article>
-      </div>
-    </section>
-
-    <section class="slide" aria-label="Métricas">
-      <span class="eyebrow">6 · Métricas de evaluación</span>
-      <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
-      <div class="grid">
-        <article class="card bad"><h3>Hold-out</h3><p>Con pocos datos hay alto riesgo de sesgo muestral: la métrica depende de qué estudiantes quedaron en prueba.</p></article>
-        <article class="card good"><h3>K-Fold estándar</h3><p>5 pliegues de 20 estudiantes: cada iteración entrena con 80 y prueba con 20.</p></article>
-      </div>
-    </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo educativo: resultados">
       <span class="eyebrow">4 · Ejemplo: predecir si un estudiante aprobará</span>
       <h2>Resultados por pliegue: <span class="accent">90%</span> promedio</h2>
@@ -668,8 +604,35 @@
         </div>
       </div>
     </section>
-
+    <section class="slide compact k-demo-slide" aria-label="Ejemplo práctico interactivo">
+      <span class="eyebrow">Ejemplo práctico interactivo</span>
+      <h2>Probemos distintos valores de <span class="accent">k</span></h2>
+      <p class="lead">Hay 10 observaciones de estudiantes. Elegí cuántos folds usar y observá qué grupo queda como test en cada vuelta.</p>
+      <div class="interactive k-demo-panel">
+        <div class="interactive-controls k-demo-row">
+          <label class="k-demo-label" for="fold-range"><span>Folds:</span> <output id="fold-value">5</output></label>
+          <input id="fold-range" class="k-demo-slider" type="range" min="2" max="10" value="5" step="1">
+          <button id="next-fold" class="k-demo-button" type="button">Cambiar vuelta</button>
+        </div>
+        <div id="demo-folds" class="demo-folds" aria-label="Distribución interactiva de observaciones"></div>
+        <p id="demo-status" class="small"></p>
+        <p class="formula k-demo-score">Accuracy promedio: <span id="demo-score">—</span></p>
+      </div>
+      <p class="small">La métrica es ilustrativa: la interacción muestra la lógica de particionar, entrenar, evaluar y promediar.</p>
+    </section>
     <!-- ===== TEMA 5 · Otros tipos y estrategias de validación cruzada ===== -->
+    <section class="slide compact" aria-label="Tipos y estrategias">
+      <span class="eyebrow">5 · Tipos y estrategias de validación cruzada</span>
+      <h2>No todos los datos se validan igual</h2>
+      <div class="grid">
+        <article class="card"><h3 class="accent">Hold-out</h3><p>Una división 80/20 o 70/30. Rápida, pero sensible al corte.</p></article>
+        <article class="card"><h3 class="accent">K-Fold</h3><p>Uso general. Habitualmente k = 5 o 10.</p></article>
+        <article class="card"><h3 class="accent">Stratified K-Fold</h3><p>Conserva la proporción de clases. Ideal para clasificación desbalanceada.</p></article>
+        <article class="card"><h3 class="accent">TimeSeriesSplit</h3><p>Respeta el orden temporal. Nunca entrena con el futuro.</p></article>
+        <article class="card"><h3 class="accent">GroupKFold</h3><p>Mantiene juntos grupos relacionados para evitar contaminación.</p></article>
+        <article class="card"><h3 class="accent">LOO / LPO</h3><p>Deja una o p observaciones afuera. Poco sesgo, alto costo.</p></article>
+      </div>
+    </section>
     <section class="slide cv-anim compact technical-slide" aria-label="Métodos exhaustivos y no exhaustivos">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
       <h2>Exhaustivos y no exhaustivos</h2>
@@ -683,7 +646,6 @@
         <article class="card"><h3 class="accent">Monte Carlo (ShuffleSplit)</h3><p class="small magenta">No exhaustivo</p><p>Divisiones aleatorias train/test repetidas. A diferencia de K-Fold, los conjuntos de prueba pueden solaparse.</p></article>
       </div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Costo computacional de cada estrategia">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
       <h2>¿Cuántos modelos hay que <span class="accent">entrenar</span>?</h2>
@@ -705,7 +667,6 @@
         <p id="cost-note" class="small"></p>
       </div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Métodos según la estructura de los datos">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
       <h2>Según la <span class="accent">estructura de los datos</span></h2>
@@ -716,7 +677,6 @@
         <article class="card"><h3 class="accent">Leave-One-Group-Out / Leave-P-Groups-Out</h3><p>Es LOO o LPO aplicado a grupos completos en lugar de observaciones individuales.</p></article>
       </div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Estratificado vs aleatorio">
       <span class="eyebrow">5 · Según la estructura de los datos</span>
       <h2>Aleatorio vs. <span class="accent">estratificado</span></h2>
@@ -732,7 +692,6 @@
       </div>
       <p class="small">Rojo = en riesgo · Blanco = aprobó.</p>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Time Series Split">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
       <h2>Time Series Split: <span class="accent">pasado → futuro</span></h2>
@@ -749,7 +708,6 @@
       </div>
       <article class="card bad"><h3>Nunca mezclar aleatoriamente una serie temporal</h3><p>Se filtraría información del futuro hacia el entrenamiento.</p></article>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Validación anidada y buenas prácticas">
       <span class="eyebrow">5 · Otros tipos y estrategias de validación cruzada</span>
       <h2>Validación anidada y <span class="accent">buenas prácticas</span></h2>
@@ -766,8 +724,15 @@
         </article>
       </div>
     </section>
-
     <!-- ===== TEMA 6 · Métricas de evaluación en validación cruzada ===== -->
+    <section class="slide" aria-label="Métricas">
+      <span class="eyebrow">6 · Métricas de evaluación</span>
+      <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
+      <div class="grid">
+        <article class="card bad"><h3>Hold-out</h3><p>Con pocos datos hay alto riesgo de sesgo muestral: la métrica depende de qué estudiantes quedaron en prueba.</p></article>
+        <article class="card good"><h3>K-Fold estándar</h3><p>5 pliegues de 20 estudiantes: cada iteración entrena con 80 y prueba con 20.</p></article>
+      </div>
+    </section>
     <section class="slide cv-anim compact technical-slide" aria-label="Métricas por fold">
       <span class="eyebrow">6 · Métricas de evaluación en validación cruzada</span>
       <h2>Una métrica por fold, luego <span class="accent">media y dispersión</span></h2>
@@ -779,7 +744,6 @@
       </div>
       <p class="formula">Reporte: media ± desviación estándar entre folds</p>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Media y dispersión entre folds">
       <span class="eyebrow">6 · Métricas de evaluación en validación cruzada</span>
       <h2>La media importa. La <span class="accent">dispersión</span> también.</h2>
@@ -794,7 +758,6 @@
         <p id="md-msg" class="bias-summary"></p>
       </div>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Matriz de confusión del ejemplo">
       <span class="eyebrow">6 · Ejemplo: matriz de confusión</span>
       <h2>El positivo es <span class="magenta">no aprobado</span></h2>
@@ -807,7 +770,6 @@
         </tbody>
       </table>
     </section>
-
     <section class="slide cv-anim compact technical-slide" aria-label="Accuracy, precision y recall del ejemplo">
       <span class="eyebrow">6 · Ejemplo: accuracy, precision y recall</span>
       <h2 id="ex-title">El 94% de accuracy <span class="magenta">tapa</span> algo</h2>
@@ -822,7 +784,27 @@
       </div>
       <p id="ex-sum" class="bias-summary"></p>
     </section>
-
+    <section class="slide compact" aria-label="Ejemplo interactivo de métricas">
+      <span class="eyebrow">Ejemplo práctico · Métricas</span>
+      <h2>¿Qué cambia cuando ajustamos el umbral?</h2>
+      <p class="lead">En una alerta temprana, mover el umbral cambia el equilibrio entre detectar estudiantes en riesgo y generar falsas alarmas.</p>
+      <div class="interactive">
+        <div class="interactive-controls">
+          <label for="risk-threshold-range"><strong>Umbral:</strong> <output id="risk-threshold-value">0,50</output></label>
+          <input id="risk-threshold-range" type="range" min="0.3" max="0.8" value="0.5" step="0.05">
+        </div>
+        <table class="confusion-table">
+          <thead><tr><th></th><th>Predice riesgo</th><th>Predice no riesgo</th></tr></thead>
+          <tbody>
+            <tr><th>Real: riesgo</th><td id="risk-tp-cell">TP: —</td><td id="risk-fn-cell">FN: —</td></tr>
+            <tr><th>Real: no riesgo</th><td id="risk-fp-cell">FP: —</td><td id="risk-tn-cell">TN: —</td></tr>
+          </tbody>
+        </table>
+        <p id="risk-metrics-status" class="small"></p>
+        <p class="formula">Precision: <span id="risk-precision-value">—</span> · Recall: <span id="risk-recall-value">—</span> · F1: <span id="risk-f1-value">—</span></p>
+      </div>
+      <p class="small">La matriz es ilustrativa: sirve para interpretar métricas, no para evaluar un modelo real.</p>
+    </section>
     <section class="slide cv-anim compact technical-slide" aria-label="Ejemplo interactivo de métricas">
       <span class="eyebrow">6 · Ejemplo práctico · Métricas</span>
       <h2>Si alerta a más estudiantes, <span class="accent">sube el recall</span> y baja la precisión</h2>
