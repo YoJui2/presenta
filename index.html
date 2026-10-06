@@ -1325,7 +1325,7 @@ for m in metricas:
     train = cv_results[f"train_{m}"].mean()
     print(f"{m:<18}{test:>6.2f}{train:>8.2f}")
 
-print("\\nTiempo de entrenamiento por fold (s):", round(cv_results["fit_time"].mean(), 2))
+
 # Accuracy alta, pero recall_macro y f1_macro bajos: el modelo falla con la clase minoritaria.
 # Train = 1.00 vs Test mucho menor: señal clara de overfitting.`,
         code3: `from sklearn.model_selection import cross_val_predict
