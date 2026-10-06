@@ -1276,26 +1276,58 @@ except NameError:
 
       // Code switcher for theme 7
       const codeOptions = {
-        code1: `from sklearn.model_selection import cross_val_score
-
+        code1: `import numpy as np
+from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
+# Dataset desbalanceado: ~95% clase 0 y ~5% clase 1 (caso típico: fraude, enfermedad rara)
+X, y = make_classification(
+    n_samples=1000, n_features=20, n_informative=3, n_redundant=2,
+    weights=[0.95, 0.05], flip_y=0.05, class_sep=0.8, random_state=42,
+)
+print("Distribución de clases:", np.bincount(y))
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 
-scores = cross_val_score(modelo, X, y, cv=5, scoring="accuracy")
+# cross_val_score: devuelve UNA sola métrica y solo del test.
+scores = cross_val_score(modelo, X, y, cv=cv, scoring="accuracy")
 
 print("Accuracy promedio:", round(scores.mean(), 2))
-print("Desviación estándar:", round(scores.std(), 2))`,
-        code2: `from sklearn.model_selection import cross_validate
-
+print("Desviación estándar:", round(scores.std(), 2))
+# Parece un modelo excelente (~0.96)... pero no sabemos qué pasa con la clase minoritaria
+# ni si el modelo está sobreajustado.`,
+        code2: `import numpy as np
+from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold, cross_validate
 
+# Mismo dataset desbalanceado: ~95% clase 0 y ~5% clase 1
+X, y = make_classification(
+    n_samples=1000, n_features=20, n_informative=3, n_redundant=2,
+    weights=[0.95, 0.05], flip_y=0.05, class_sep=0.8, random_state=42,
+)
+print("Distribución de clases:", np.bincount(y))
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 modelo = RandomForestClassifier(n_estimators=100, random_state=42)
 
-cv_results = cross_validate(modelo, X, y, scoring=["accuracy", "precision_macro", "recall_macro", "f1_macro"], cv=5, return_train_score=True)
+# cross_validate: varias métricas a la vez + score de train + tiempos.
+metricas = ["accuracy", "precision_macro", "recall_macro", "f1_macro"]
+cv_results = cross_validate(
+    modelo, X, y, cv=cv, scoring=metricas, return_train_score=True
+)
 
-print("Test F1 Macro:", round(cv_results["test_f1_macro"].mean(), 2))
-print("Train F1 Macro:", round(cv_results["train_f1_macro"].mean(), 2))  # Permite auditar overfitting`,
+print(f"\\n{'Métrica':<18}{'Test':>6}{'Train':>8}")
+for m in metricas:
+    test = cv_results[f"test_{m}"].mean()
+    train = cv_results[f"train_{m}"].mean()
+    print(f"{m:<18}{test:>6.2f}{train:>8.2f}")
+
+print("\\nTiempo de entrenamiento por fold (s):", round(cv_results["fit_time"].mean(), 2))
+# Accuracy alta, pero recall_macro y f1_macro bajos: el modelo falla con la clase minoritaria.
+# Train = 1.00 vs Test mucho menor: señal clara de overfitting.`,
         code3: `from sklearn.model_selection import cross_val_predict
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
